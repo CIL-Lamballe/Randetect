@@ -2,9 +2,9 @@
 
 ## Samba Log Database
 # Path
-SLDPATH='/var/log/synolog/'
+SLDPATH='/home/antoine/SynologyNAS_RansomwareAnalyzer/'
 # Name
-SLDNAME='.SMBXFERDB'
+SLDNAME='SMBXFERDB_test'
 
 
 ## Database format (line 1: Element name, line 2: Tuple default value) 
