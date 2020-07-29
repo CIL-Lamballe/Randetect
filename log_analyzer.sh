@@ -32,4 +32,4 @@ SLDNAME='SMBXFERDB_test'
 #sqlite3 ${SLDPATH}${SLDNAME} "SELECT distinct username, ip FROM logs ORDER BY username ASC"
 
 
-sqlite3 SMBXFERDB_test "select A.filename, A.ip, A.username, A.cmd, B.cmd, A.time, B.time from logs A, logs B where A.filename=B.filename and A.cmd='create' and B.cmd='write' and A.time<=B.time and (B.time-A.time)<=1"
+sqlite3 ${SLDPATH}${SLDNAME} "select A.filename, A.ip, A.username, A.cmd, B.cmd, A.time, B.time from logs A, logs B where A.filename=B.filename and A.cmd='create' and B.cmd='write' and A.time<=B.time and (B.time-A.time)<=1"
