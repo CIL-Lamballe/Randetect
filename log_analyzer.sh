@@ -31,10 +31,10 @@ SLDNAME='SMBXFERDB_test'
 ## SQL Query from Synology Database
 
 # Pairs create and write within 1 second
-sqlite3 ${SLDPATH}${SLDNAME} "select A.filename, A.ip, A.username, A.cmd, B.cmd, A.time, B.time from logs A, logs B where A.filename=B.filename and A.cmd='create' and B.cmd='write' and A.time<=B.time and (B.time-A.time)<=1"
+sqlite3 ${SLDPATH}${SLDNAME} "select A.id, A.filename, A.ip, A.username, A.cmd, B.cmd, A.time, B.time from logs A, logs B where A.filename=B.filename and A.cmd='create' and B.cmd='write' and A.time<=B.time and (B.time-A.time)<=1"
 
 # Pairs read/delete within y minutes
 ymin=300
-sqlite3 ${SLDPATH}${SLDNAME} "select A.filename, A.ip, A.username, A.cmd, B.cmd, A.time, B.time from logs A, logs B where A.filename=B.filename and A.cmd='read' and B.cmd='delete' and A.time<=B.time and (B.time-A.time)<=$ymin"
+sqlite3 ${SLDPATH}${SLDNAME} "select A.id, A.filename, A.ip, A.username, A.cmd, B.cmd, A.time, B.time from logs A, logs B where A.filename=B.filename and A.cmd='read' and B.cmd='delete' and A.time<=B.time and (B.time-A.time)<=$ymin"
 
 # Check if write file and delete file has similar name and same size to guess whether it is a ransomware
