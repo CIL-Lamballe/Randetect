@@ -2,6 +2,7 @@
 
 A naive implementation of a ransomware acitivity analyzer on Synology NAS.
 
+This project aims at building a compiled object deamon for Synology NAS launched by contrab at boot time. It monitors the changes made to the filesystem by clients, filtering it with a customizable set of rules.
 
 ## NAS Log Queries Relational Algebra
 
