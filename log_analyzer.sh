@@ -37,7 +37,7 @@ SLDNAME='SMBXFERDB_test'
 ymin=300
 #sqlite3 ${SLDPATH}${SLDNAME} "select C.id, C.filename, C.ip, C.username, C.cmd, D.cmd, C.time as ctime, D.time from logs C, logs D where C.isdir=0 and D.isdir=0 and C.filename=D.filename and C.cmd='read' and D.cmd='delete' and C.time<=D.time and (D.time-C.time)<=$ymin"
 
-# Check if write file and delete file has similar name and same size to guess whether it is a ransomware
+# Check if write file and delete file has similarities name and same size to guess whether it is a ransomware
 IFS=$'\n'
 
 QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
@@ -46,16 +46,20 @@ from
 (
 	select A.id, A.filename, A.ip, A.username, A.cmd, B.cmd, A.time, B.time as btime
 	from logs A, logs B
-	where A.isdir=0 and B.isdir=0 and A.filename=B.filename and A.cmd='create' and B.cmd='write' and A.time<=B.time and (B.time-A.time)<=1
+	where A.isdir=0 and B.isdir=0 and A.filename=B.filename and A.cmd='create' and B.cmd='write'
+	and A.time<=B.time and (B.time-A.time)<=1
 ) CWp,
 (
 	select C.id, C.filename, C.ip, C.username, C.cmd, D.cmd, C.time as ctime, D.time from
 	logs C, logs D
-	where C.isdir=0 and D.isdir=0 and C.filename=D.filename and C.cmd='read' and D.cmd='delete' and C.time<=D.time and (D.time-C.time)<=$ymin
+	where C.isdir=0 and D.isdir=0 and C.filename=D.filename and C.cmd='read' and D.cmd='delete'
+	and C.time<=D.time and (D.time-C.time)<=$ymin
 ) RDp
-where CWp.filename=RDp.filename and CWp.btime=RDp.ctime"`
+where CWp.btime=RDp.ctime"`
 
 for i in ${QUERY}
 do
-	echo $i | cut -d '|' -f2
+	echo $i
+	#echo $i | cut -d '|' -f2
+	#echo $i | cut -d '|' -f10
 done
