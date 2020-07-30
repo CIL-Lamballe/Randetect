@@ -44,13 +44,13 @@ QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
 select *
 from
 (
-	select A.id, A.filename, A.ip, A.username, A.cmd, B.cmd, A.time, B.time as btime
+	select A.id, A.filename, B.filesize, A.ip, A.username, A.cmd, B.cmd, A.time, B.time as btime
 	from logs A, logs B
 	where A.isdir=0 and B.isdir=0 and A.filename=B.filename and A.cmd='create' and B.cmd='write'
 	and A.time<=B.time and (B.time-A.time)<=1
 ) CWp,
 (
-	select C.id, C.filename, C.ip, C.username, C.cmd, D.cmd, C.time as ctime, D.time from
+	select C.id, C.filename, C.filesize, C.ip, C.username, C.cmd, D.cmd, C.time as ctime, D.time from
 	logs C, logs D
 	where C.isdir=0 and D.isdir=0 and C.filename=D.filename and C.cmd='read' and D.cmd='delete'
 	and C.time<=D.time and (D.time-C.time)<=$ymin
@@ -60,6 +60,12 @@ where CWp.btime=RDp.ctime"`
 for i in ${QUERY}
 do
 	echo $i
-	#echo $i | cut -d '|' -f2
-	#echo $i | cut -d '|' -f10
+#	echo $i | cut -d '|' -f2
+#	echo $i | cut -d '|' -f11
+	# Case the names are sames
+#	if [ `echo $i | cut -d '|' -f2` = `echo $i | cut -d '|' -f10` ]
+#	then
+	#	printf "\n\n$i\n\n"
+#		printf "$i\n"
+#	fi
 done
