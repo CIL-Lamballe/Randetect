@@ -1,6 +1,6 @@
-# Synology NAS Ransomware Detector
+# Ransomware Detector for Synology NAS
 
-An implementation of a naive ransomware detection algorithm on Synology NAS.
+An implementation of a naive ransomware detection algorithm on Synology Network Attached Storage.
 
 This project aims at building a compiled object deamon for Synology NAS launched by contrab at boot time. It monitors the changes made to the filesystem by clients, filtering it with a customizable set of rules.
 
