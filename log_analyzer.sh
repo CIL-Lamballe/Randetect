@@ -19,10 +19,12 @@ SLDNAME='SMBXFERDB_test'
 ## SQL Query from Synology Database
 
 # Pairs create and write within x seconds
+#Time between a create and a write operation on a same file
 xmin=1
 #sqlite3 ${SLDPATH}${SLDNAME} "select A.ip, A.username, A.filename, B.filesize as wrotefilesize, A.cmd, A.time, B.cmd, B.time as btime from logs A, logs B where A.isdir=0 and B.isdir=0 and A.filename=B.filename and A.cmd='create' and B.cmd='write' and A.time<=B.time and (B.time-A.time)<=$xmin"
 
 # Pairs read/delete within y seconds
+#Time between a read and a delete operation on a same file
 ymin=300
 #sqlite3 ${SLDPATH}${SLDNAME} "select C.filename, D.filesize as deletedfilesize, C.cmd, C.time as ctime, D.cmd, D.time from logs C, logs D where C.isdir=0 and D.isdir=0 and C.filename=D.filename and C.cmd='read' and D.cmd='delete' and C.time<=D.time and (D.time-C.time)<=$ymin"
 
