@@ -2,9 +2,8 @@
 
 An implementation of a naive ransomware detection algorithm running on Synology Network Attached Storage.
 
-This project aims at building a compiled object deamon for Synology NAS launched by contrab at boot time. It monitors the changes made to the filesystem by clients, filtering it with a customizable set of rules.
+This project aims at building a deamon started at DSM boot time. The deamon will monitors the changes made to the filesystem by its clients, filtering it with a customizable set of rules and banning ips or powering off the NAS depending on criticity level.
 
-Encrypting does not inherently make a file larger but most of the time it does, for this reason we randomly checksum the files been raised by the alert.
 
 ## NAS Log Queries Relational Algebra
 
@@ -12,3 +11,5 @@ Encrypting does not inherently make a file larger but most of the time it does, 
 
 
 <img src="https://latex.codecogs.com/gif.latex?\small&space;\prod_{ip,&space;username}\sigma_{C.cmd\,=\,'read'&space;\;\cap\;&space;D.cmd\,=\,'delete'&space;\;\cap\;&space;C.filename\,=\,D.filename&space;\;\cap\;&space;0\,\geq\,&space;D.time-C.time\,\leq\,&space;y,\:&space;y\,&space;\neq\,&space;0&space;}&space;\left&space;(&space;\rho_{C}&space;\left&space;(logs&space;\right&space;)&space;\times&space;\rho_{D}\left&space;(&space;logs&space;\right&space;)&space;\right&space;)" title="\small \prod_{ip, username}\sigma_{C.cmd\,=\,'read' \;\cap\; D.cmd\,=\,'delete' \;\cap\; C.filename\,=\,D.filename \;\cap\; 0\,\geq\, D.time-C.time\,\leq\, y,\: y\, \neq\, 0 } \left ( \rho_{C} \left (logs \right ) \times \rho_{D}\left ( logs \right ) \right )" />
+
+Encrypting does not inherently make a file larger but most of the time it does, for this reason we randomly checksum the files been raised by the alert.
