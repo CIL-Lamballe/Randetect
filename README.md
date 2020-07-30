@@ -1,8 +1,10 @@
-# Synology NAS Ransomware Analyzer
+# Synology NAS Ransomware Detector
 
-A naive implementation of a ransomware acitivity analyzer on Synology NAS.
+An implementation of a naive ransomware detection algorithm on Synology NAS.
 
 This project aims at building a compiled object deamon for Synology NAS launched by contrab at boot time. It monitors the changes made to the filesystem by clients, filtering it with a customizable set of rules.
+
+Encrypting does not inherently make a file larger but most of the time it does, for this reason we randomly checksum the files been raised by the alert.
 
 ## NAS Log Queries Relational Algebra
 
