@@ -32,7 +32,7 @@ QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
 select *
 from
 (
-	select A.filename, B.filesize as wrotefilesize, A.cmd, A.time, B.cmd, B.time as btime
+	select A.ip, A.username, A.filename, B.filesize as wrotefilesize, A.cmd, A.time, B.cmd, B.time as btime
 	from logs A, logs B
 	where A.isdir=0 and B.isdir=0 and A.filename=B.filename and A.cmd='create' and B.cmd='write'
 	and A.time<=B.time and (B.time-A.time)<=1
@@ -47,33 +47,17 @@ where CWp.btime=RDp.ctime and RDp.deletedfilesize<=CWp.wrotefilesize and RDp.del
 
 for i in ${QUERY}
 do
-#	filenameA=`echo $i | cut -d '|' -f2`
-#	filenameC=`echo $i | cut -d '|' -f11`
-#	if [ ${filenameA} = ${filenameC} ]
-#	then
-		# Same size ?
-		printf "\n$i\n"
-#		echo $i | cut -d '|' -f3
-#		echo $i | cut -d '|' -f19
-#		if [ `echo $i | cut -d '|' -f3` -eq `echo $i | cut -d '|' -f19` ]
-#		then
-#			echo "Same size"
-#			cksA=`cksum ${filenameA} &>/dev/null`
-#			cksC=`cksum ${filenameC} &>/dev/null`
-			# Same chsum ?
-#			if [ $((${cksA[0]})) -eq $((${cksC[0]})) ]
-#			then
-#				echo "Same checksum, it was a copy"
-#			else
-#				echo "Illegal instruction: bad shasum"
-#			fi
-#		else
-#			printf "\n$i\n"
-#		fi
-#	else
-#		echo "Illegal instruction: no similar names"
-#	fi
-	# Debug
-	#	printf "$i\n"
-	#	printf "\n\n$i\n\n"
+	filenameA=`echo $i | cut -d '|' -f3`
+	filenameC=`echo $i | cut -d '|' -f9`
+	if [ `echo $i | cut -d '|' -f4` -eq `echo $i | cut -d '|' -f10` ]
+	then
+		cksA=`cksum ${filenameA} &>/dev/null`
+		cksC=`cksum ${filenameC} &>/dev/null`
+		if [ $((${cksA[0]})) -ne $((${cksC[0]})) ]
+		then
+			printf "\nChecksum Suspect operation:\n$i\n"
+		fi
+	else
+		printf "Filesize Suspect operation:\n$i\n"
+	fi
 done
