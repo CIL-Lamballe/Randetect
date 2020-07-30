@@ -1,18 +1,6 @@
 #!/bin/bash
 
 
-##                        GENERAL ARCHITECTURE
-##
-##         Crontab -|
-##                  |-> ./ransomware_analyzer * checksum
-##
-##
-##
-##
-##
-##
-
-
 ## Samba Log Database
 # Path
 SLDPATH='/home/antoine/SynologyNAS_RansomwareAnalyzer/'
@@ -59,13 +47,27 @@ where CWp.btime=RDp.ctime"`
 
 for i in ${QUERY}
 do
-	echo $i
-#	echo $i | cut -d '|' -f2
-#	echo $i | cut -d '|' -f11
-	# Case the names are sames
-#	if [ `echo $i | cut -d '|' -f2` = `echo $i | cut -d '|' -f10` ]
-#	then
+	filenameA=`echo $i | cut -d '|' -f2`
+	filenameC=`echo $i | cut -d '|' -f11`
+	if [ ${filenameA} = ${filenameC} ]
+	then
+		echo "Same name, here should check similar name instead"
+		if [ `echo $i | cut -d '|' -f3` -eq `echo $i | cut -d '|' -f12` ]
+		then
+			echo "Same size"
+			sizeA=`sha1sum ${filenameA}`
+			sizeC=`sha1sum ${filenameC}`
+			if [ $((${sizeA[0]})) -eq $((${sizeC[0]})) ]
+			then
+				echo "Same checksum"
+			else
+				echo "Illegal instruction"
+			fi
+		fi
+	else
+		echo "Illegal instruction"
+	fi
+	# Debug
+	#	printf "$i\n"
 	#	printf "\n\n$i\n\n"
-#		printf "$i\n"
-#	fi
 done
