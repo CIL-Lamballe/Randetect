@@ -49,24 +49,24 @@ for i in ${QUERY}
 do
 	filenameA=`echo $i | cut -d '|' -f2`
 	filenameC=`echo $i | cut -d '|' -f11`
-	if [ ${filenameA} = ${filenameC} ]
-	then
-		echo "Same name, here should check similar name instead"
+#	if [ ${filenameA} = ${filenameC} ]
+#	then
+#		echo "Same name, here should check similar name instead"
 		if [ `echo $i | cut -d '|' -f3` -eq `echo $i | cut -d '|' -f12` ]
 		then
 			echo "Same size"
-			sizeA=`sha1sum ${filenameA}`
-			sizeC=`sha1sum ${filenameC}`
-			if [ $((${sizeA[0]})) -eq $((${sizeC[0]})) ]
+			cksA=`cksum ${filenameA}`
+			cksC=`cksum ${filenameC}`
+			if [ $((${cksA[0]})) -eq $((${cksC[0]})) ]
 			then
-				echo "Same checksum"
+				echo "Same checksum, it was a copy"
 			else
-				echo "Illegal instruction"
+				echo "Illegal instruction: bad shasum"
 			fi
 		fi
-	else
-		echo "Illegal instruction"
-	fi
+#	else
+#		echo "Illegal instruction: no similar names"
+#	fi
 	# Debug
 	#	printf "$i\n"
 	#	printf "\n\n$i\n\n"
