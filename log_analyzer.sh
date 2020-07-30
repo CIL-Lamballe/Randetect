@@ -32,38 +32,44 @@ QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
 select *
 from
 (
-	select A.id, A.filename, B.filesize, A.ip, A.username, A.cmd, B.cmd, A.time, B.time as btime
+	select A.filename, B.filesize as wrotefilesize, A.cmd, A.time, B.cmd, B.time as btime
 	from logs A, logs B
 	where A.isdir=0 and B.isdir=0 and A.filename=B.filename and A.cmd='create' and B.cmd='write'
 	and A.time<=B.time and (B.time-A.time)<=1
 ) CWp,
 (
-	select C.id, C.filename, C.filesize, C.ip, C.username, C.cmd, D.cmd, C.time as ctime, D.time from
-	logs C, logs D
+	select C.filename, D.filesize as deletedfilesize, C.cmd, C.time as ctime, D.cmd, D.time
+	from logs C, logs D
 	where C.isdir=0 and D.isdir=0 and C.filename=D.filename and C.cmd='read' and D.cmd='delete'
 	and C.time<=D.time and (D.time-C.time)<=$ymin
 ) RDp
-where CWp.btime=RDp.ctime"`
+where CWp.btime=RDp.ctime and RDp.deletedfilesize<=CWp.wrotefilesize and RDp.deletedfilesize>0"`
 
 for i in ${QUERY}
 do
-	filenameA=`echo $i | cut -d '|' -f2`
-	filenameC=`echo $i | cut -d '|' -f11`
+#	filenameA=`echo $i | cut -d '|' -f2`
+#	filenameC=`echo $i | cut -d '|' -f11`
 #	if [ ${filenameA} = ${filenameC} ]
 #	then
-#		echo "Same name, here should check similar name instead"
-		if [ `echo $i | cut -d '|' -f3` -eq `echo $i | cut -d '|' -f12` ]
-		then
-			echo "Same size"
-			cksA=`cksum ${filenameA}`
-			cksC=`cksum ${filenameC}`
-			if [ $((${cksA[0]})) -eq $((${cksC[0]})) ]
-			then
-				echo "Same checksum, it was a copy"
-			else
-				echo "Illegal instruction: bad shasum"
-			fi
-		fi
+		# Same size ?
+		printf "\n$i\n"
+#		echo $i | cut -d '|' -f3
+#		echo $i | cut -d '|' -f19
+#		if [ `echo $i | cut -d '|' -f3` -eq `echo $i | cut -d '|' -f19` ]
+#		then
+#			echo "Same size"
+#			cksA=`cksum ${filenameA} &>/dev/null`
+#			cksC=`cksum ${filenameC} &>/dev/null`
+			# Same chsum ?
+#			if [ $((${cksA[0]})) -eq $((${cksC[0]})) ]
+#			then
+#				echo "Same checksum, it was a copy"
+#			else
+#				echo "Illegal instruction: bad shasum"
+#			fi
+#		else
+#			printf "\n$i\n"
+#		fi
 #	else
 #		echo "Illegal instruction: no similar names"
 #	fi
