@@ -32,34 +32,40 @@ ymin=300
 # Check if write file and delete file has similarities name and same size to guess whether it is a ransomware
 IFS=$'\n'
 
-QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
-select *
-from
-(
-	select A.ip, A.username, A.filename, B.filesize as wrotefilesize, A.cmd, A.time, B.cmd, B.time as btime
-	from logs A, logs B
-	where A.isdir=0 and B.isdir=0 and A.filename=B.filename and A.cmd='create' and B.cmd='write'
-	and A.time<=B.time and (B.time-A.time)<=$xmin
-) CWp,
-(
-	select C.filename, D.filesize as deletedfilesize, C.cmd, C.time as ctime, D.cmd, D.time
-	from logs C, logs D
-	where C.isdir=0 and D.isdir=0 and C.filename=D.filename and C.cmd='read' and D.cmd='delete'
-	and C.time<=D.time and (D.time-C.time)<=$ymin
-) RDp
-where CWp.btime=RDp.ctime and RDp.deletedfilesize<=CWp.wrotefilesize and RDp.deletedfilesize>0"`
+#QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
+#select *
+#from
+#(
+#	select A.ip, A.username, A.filename, B.filesize as wrotefilesize, A.cmd, A.time, B.cmd, B.time as btime
+#	from logs A, logs B
+#	where A.isdir=0 and B.isdir=0 and A.filename=B.filename and A.cmd='create' and B.cmd='write'
+#	and A.time<=B.time and (B.time-A.time)<=$xmin
+#) CWp,
+#(
+#	select C.filename, D.filesize as deletedfilesize, C.cmd, C.time as ctime, D.cmd, D.time
+#	from logs C, logs D
+#	where C.isdir=0 and D.isdir=0 and C.filename=D.filename and C.cmd='read' and D.cmd='delete'
+#	and C.time<=D.time and (D.time-C.time)<=$ymin
+#) RDp
+#where CWp.btime=RDp.ctime and RDp.deletedfilesize<=CWp.wrotefilesize and RDp.deletedfilesize>0"`
+
+# Last 2000
+#sqlite3 .SMBXFERDB "select * from logs where id>(select max(id)-2000 from logs)"
 
 QUERY2=`sqlite3 ${SLDPATH}${SLDNAME} "
 select *
 from
 (
 	select A.ip, A.username, A.filename, B.filesize as wrotefilesize, A.cmd, A.time, B.cmd, B.time as btime
-	from logs A, logs B
-	where A.isdir=0 and B.isdir=0 and A.filename=B.filename and A.cmd='create' and B.cmd='write'
-	and A.time<=B.time and (B.time-A.time)<=$xmin
+	from (select * from logs where id>(select max(id)-2000 from logs)) A,
+		(select * from logs where id>(select max(id)-2000 from logs)) B
+	where A.isdir=0 and B.isdir=0
+		and A.filename=B.filename
+		and A.cmd='create' and B.cmd='write'
+		and A.time<=B.time and (B.time-A.time)<=$xmin
 ) CWp,
 (
-	select C.filename, D.filesize as deletedfilesize, C.cmd, C.time as ctime, D.cmd, D.time
+	select C.filename, C.cmd, C.time as ctime, D.cmd, D.time
 	from logs C, logs D
 	where C.isdir=0 and D.isdir=0 and C.filename=D.filename and C.cmd='read' and D.cmd='delete'
 	and C.time<=D.time and (D.time-C.time)<=$ymin
