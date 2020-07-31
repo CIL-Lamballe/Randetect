@@ -14,7 +14,7 @@ xmin=1
 
 # Pairs read/delete within y seconds
 #Time between a read and a delete operation on a same file
-ymin=300
+ymin=5
 #sqlite3 ${SLDPATH}${SLDNAME} "select C.filename, D.filesize as deletedfilesize, C.cmd, C.time as ctime, D.cmd, D.time from logs C, logs D where C.isdir=0 and D.isdir=0 and C.filename=D.filename and C.cmd='read' and D.cmd='delete' and C.time<=D.time and (D.time-C.time)<=$ymin"
 
 # Check if write file and delete file has similarities name and same size to guess whether it is a ransomware
@@ -37,8 +37,9 @@ IFS=$'\n'
 #) RDp
 #where CWp.btime=RDp.ctime and RDp.deletedfilesize<=CWp.wrotefilesize and RDp.deletedfilesize>0"`
 
-# Last 2000
-#sqlite3 .SMBXFERDB "select * from logs where id>(select max(id)-2000 from logs)"
+# Last range
+range=2000
+#sqlite3 .SMBXFERDB "select * from logs where id > (select max(id) - $range from logs)"
 
 QUERY2=`sqlite3 ${SLDPATH}${SLDNAME} "
 select *
@@ -52,7 +53,7 @@ from
 		select *
 		from logs
 		where id > (
-				select max(id) - 2000
+				select max(id) - $range
 				from logs
 				)
 			and isdir=0
@@ -61,7 +62,7 @@ from
 			select *
 			from logs
 			where id > (
-				select max(id) - 2000
+				select max(id) - $range
 				from logs
 					)
 				and isdir=0
@@ -75,24 +76,24 @@ from
 	from logs
 	where isdir = 0 and cmd = 'delete'
 ) D
-# Here is the folow to filter properly
-where CWp.writetime=D.time and RDp.deletedfilesize<=CWp.wrotefilesize and RDp.deletedfilesize>0"`
+where CWp.writetime <= D.time
+	and (D.time - CWp.writetime) <= $ymin
+	and D.filesize <= CWp.wrotefilesize"`
 
-#	and C.time<=D.time and (D.time-C.time)<=$ymin
 
-for i in ${QUERY}
-do
-	filenameA=`echo $i | cut -d '|' -f3`
-	filenameC=`echo $i | cut -d '|' -f9`
-	if [ `echo $i | cut -d '|' -f4` -eq `echo $i | cut -d '|' -f10` ]
-	then
-		cksA=`cksum ${filenameA} &>/dev/null`
-		cksC=`cksum ${filenameC} &>/dev/null`
-		if [ $((${cksA[0]})) -ne $((${cksC[0]})) ]
-		then
-			printf "\nChecksum Suspect operation:\n$i\n"
-		fi
-	else
-		printf "Filesize Suspect operation:\n$i\n"
-	fi
-done
+#for i in ${QUERY}
+#do
+#	filenameA=`echo $i | cut -d '|' -f3`
+#	filenameC=`echo $i | cut -d '|' -f9`
+#	if [ `echo $i | cut -d '|' -f4` -eq `echo $i | cut -d '|' -f10` ]
+#	then
+#		cksA=`cksum ${filenameA} &>/dev/null`
+#		cksC=`cksum ${filenameC} &>/dev/null`
+#		if [ $((${cksA[0]})) -ne $((${cksC[0]})) ]
+#		then
+#			printf "\nChecksum Suspect operation:\n$i\n"
+#		fi
+#	else
+#		printf "Filesize Suspect operation:\n$i\n"
+#	fi
+#done
