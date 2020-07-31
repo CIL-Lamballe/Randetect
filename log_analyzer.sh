@@ -6,8 +6,7 @@
 #SLDPATH='/var/log/synolog/'
 SLDPATH='/home/antoine/SynologyNAS_RansomwareAnalyzer/'
 # Name
-#SLDNAME='.SMBXFERDB'
-SLDNAME='SMBXFERDB_test'
+SLDNAME='.SMBXFERDB'
 
 
 ## Database Format (line 1: Element name, line 2: Tuple default value)
@@ -34,6 +33,23 @@ ymin=300
 IFS=$'\n'
 
 QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
+select *
+from
+(
+	select A.ip, A.username, A.filename, B.filesize as wrotefilesize, A.cmd, A.time, B.cmd, B.time as btime
+	from logs A, logs B
+	where A.isdir=0 and B.isdir=0 and A.filename=B.filename and A.cmd='create' and B.cmd='write'
+	and A.time<=B.time and (B.time-A.time)<=$xmin
+) CWp,
+(
+	select C.filename, D.filesize as deletedfilesize, C.cmd, C.time as ctime, D.cmd, D.time
+	from logs C, logs D
+	where C.isdir=0 and D.isdir=0 and C.filename=D.filename and C.cmd='read' and D.cmd='delete'
+	and C.time<=D.time and (D.time-C.time)<=$ymin
+) RDp
+where CWp.btime=RDp.ctime and RDp.deletedfilesize<=CWp.wrotefilesize and RDp.deletedfilesize>0"`
+
+QUERY2=`sqlite3 ${SLDPATH}${SLDNAME} "
 select *
 from
 (
