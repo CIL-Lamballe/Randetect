@@ -10,7 +10,7 @@ range=2000
 
 QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
 SELECT
-	*
+	D.ip
 FROM
 	(
 		SELECT
@@ -70,21 +70,6 @@ WHERE
 
 for i in ${QUERY}
 do
-	filenameA=`echo $i | cut -d '|' -f3`
-	filenameC=`echo $i | cut -d '|' -f9`
-	echo $filenameA
-#	if [ $filenameA = $filenameB ]
-#	then
-#		if [ `echo $i | cut -d '|' -f4` -eq `echo $i | cut -d '|' -f10` ]
-#		then
-#			cksA=`cksum ${filenameA} &>/dev/null`
-#			cksC=`cksum ${filenameC} &>/dev/null`
-#			if [ $((${cksA[0]})) -ne $((${cksC[0]})) ]
-#				then
-#				printf "\nChecksum Suspect operation:\n$i\n"
-#			fi
-#		else
-#			printf "Filesize Suspect operation:\n$i\n"
-#		fi
-#	fi
+	echo $i
+	
 done
