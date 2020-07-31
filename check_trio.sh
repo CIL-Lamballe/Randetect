@@ -68,6 +68,8 @@ WHERE
 	AND D.filesize <= CWp.wrotefilesize
 ;"`
 
+BLACKLIST=()
+
 for i in ${QUERY}
 do
 	echo $i
