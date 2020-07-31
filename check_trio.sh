@@ -4,7 +4,6 @@ IFS=$'\n'
 #SLDPATH='/var/log/synolog/'
 SLDPATH='/home/antoine/SynologyNAS_RansomwareAnalyzer/'
 SLDNAME='.SMBXFERDB'
-
 xmin=1
 ymin=3
 range=2000
@@ -67,21 +66,25 @@ WHERE
 	CWp.writetime <= D.time
 	AND (D.time - CWp.writetime) <= $ymin
 	AND D.filesize <= CWp.wrotefilesize
-;"
+;"`
 
 for i in ${QUERY}
 do
 	filenameA=`echo $i | cut -d '|' -f3`
 	filenameC=`echo $i | cut -d '|' -f9`
-	if [ `echo $i | cut -d '|' -f4` -eq `echo $i | cut -d '|' -f10` ]
-	then
-		cksA=`cksum ${filenameA} &>/dev/null`
-		cksC=`cksum ${filenameC} &>/dev/null`
-		if [ $((${cksA[0]})) -ne $((${cksC[0]})) ]
-		then
-			printf "\nChecksum Suspect operation:\n$i\n"
-		fi
-	else
-		printf "Filesize Suspect operation:\n$i\n"
-	fi
+	echo $filenameA
+#	if [ $filenameA = $filenameB ]
+#	then
+#		if [ `echo $i | cut -d '|' -f4` -eq `echo $i | cut -d '|' -f10` ]
+#		then
+#			cksA=`cksum ${filenameA} &>/dev/null`
+#			cksC=`cksum ${filenameC} &>/dev/null`
+#			if [ $((${cksA[0]})) -ne $((${cksC[0]})) ]
+#				then
+#				printf "\nChecksum Suspect operation:\n$i\n"
+#			fi
+#		else
+#			printf "Filesize Suspect operation:\n$i\n"
+#		fi
+#	fi
 done
