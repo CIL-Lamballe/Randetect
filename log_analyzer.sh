@@ -10,43 +10,64 @@ ymin=300
 range=2000
 
 QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
-select *
-from
-(
-	select A.ip, A.username, A.filename,
-		B.filesize as wrotefilesize, A.cmd,
-		A.time as createtime, B.cmd,
-		B.time as writetime
-	from (
-		select *
-		from logs
-		where id > (
-				select max(id) - $range
-				from logs
-				)
-			and isdir=0
-	     ) A,
-		(
-			select *
-			from logs
-			where id > (
-				select max(id) - $range
-				from logs
+SELECT
+	*
+FROM
+	(
+		SELECT
+			A.ip, A.username, A.filename,
+			B.filesize as wrotefilesize, A.cmd,
+			A.time as createtime, B.cmd,
+			B.time as writetime
+		FROM
+			(
+				SELECT
+						*
+				FROM
+					logs
+				WHERE
+					id > (
+						SELECT
+							MAX(id) - $range
+						FROM
+							logs
+						WHERE
+							isdir = 0
 					)
-				and isdir=0
-	     ) B
-	where A.filename = B.filename
-		and A.cmd = 'create' and B.cmd = 'write'
-		and createtime <= writetime and (writetime - createtime) <= $xmin
-) CWp,
-(
-	select *
-	from logs
-	where isdir = 0 and cmd = 'delete'
-) D
-where CWp.writetime <= D.time
-	and (D.time - CWp.writetime) <= $ymin
-	and D.filesize <= CWp.wrotefilesize"`
+	     		) A,
+			(
+				SELECT
+					*
+				FROM
+					logs
+				WHERE
+					id > (
+						SELECT
+							MAX(id) - $range
+						FROM
+							logs
+						WHERE
+							isdir = 0
+					)
+	     		) B
+		WHERE
+			A.filename = B.filename
+			AND A.cmd = 'create' AND B.cmd = 'write'
+			AND createtime <= writetime AND (writetime - createtime) <= $xmin
+	) CWp,
+	(
+		SELECT
+			*
+		FROM
+			logs
+		WHERE
+			isdir = 0 AND cmd = 'delete'
+	) D
+WHERE
+	CWp.writetime <= D.time
+	AND (D.time - CWp.writetime) <= $ymin
+	AND D.filesize <= CWp.wrotefilesize
+;"`
 
 
 #for i in ${QUERY}

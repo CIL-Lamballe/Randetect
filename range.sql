@@ -5,7 +5,7 @@ FROM
 WHERE
 	id > (
 		SELECT
-			MAX(id) - $range
+			MAX(id) - 2000
 		FROM
 			logs
 		WHERE
