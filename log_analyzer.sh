@@ -80,16 +80,17 @@ from
 	     ) B
 	where A.filename = B.filename
 		and A.cmd = 'create' and B.cmd = 'write'
-		and A.time <= writetime and (writetime - A.time) <= $xmin
+		and createtime <= writetime and (writetime - createtime) <= $xmin
 ) CWp,
 (
 	select *
 	from logs
-	where isdir = 0
-		and cmd = 'delete'
-	and C.time<=D.time and (D.time-C.time)<=$ymin
+	where isdir = 0 and cmd = 'delete'
 ) D
-where CWp.btime=D.time and RDp.deletedfilesize<=CWp.wrotefilesize and RDp.deletedfilesize>0"`
+# Here is the folow to filter properly
+where CWp.writetime=D.time and RDp.deletedfilesize<=CWp.wrotefilesize and RDp.deletedfilesize>0"`
+
+#	and C.time<=D.time and (D.time-C.time)<=$ymin
 
 for i in ${QUERY}
 do
