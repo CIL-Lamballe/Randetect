@@ -56,21 +56,40 @@ QUERY2=`sqlite3 ${SLDPATH}${SLDNAME} "
 select *
 from
 (
-	select A.ip, A.username, A.filename, B.filesize as wrotefilesize, A.cmd, A.time, B.cmd, B.time as btime
-	from (select * from logs where id>(select max(id)-2000 from logs)) A,
-		(select * from logs where id>(select max(id)-2000 from logs)) B
-	where A.isdir=0 and B.isdir=0
-		and A.filename=B.filename
-		and A.cmd='create' and B.cmd='write'
-		and A.time<=B.time and (B.time-A.time)<=$xmin
+	select A.ip, A.username, A.filename,
+		B.filesize as wrotefilesize, A.cmd,
+		A.time as createtime, B.cmd,
+		B.time as writetime
+	from (
+		select *
+		from logs
+		where id > (
+				select max(id) - 2000
+				from logs
+				)
+			and isdir=0
+	     ) A,
+		(
+			select *
+			from logs
+			where id > (
+				select max(id) - 2000
+				from logs
+					)
+				and isdir=0
+	     ) B
+	where A.filename = B.filename
+		and A.cmd = 'create' and B.cmd = 'write'
+		and A.time <= writetime and (writetime - A.time) <= $xmin
 ) CWp,
 (
-	select C.filename, C.cmd, C.time as ctime, D.cmd, D.time
-	from logs C, logs D
-	where C.isdir=0 and D.isdir=0 and C.filename=D.filename and C.cmd='read' and D.cmd='delete'
+	select *
+	from logs
+	where isdir = 0
+		and cmd = 'delete'
 	and C.time<=D.time and (D.time-C.time)<=$ymin
-) RDp
-where CWp.btime=RDp.ctime and RDp.deletedfilesize<=CWp.wrotefilesize and RDp.deletedfilesize>0"`
+) D
+where CWp.btime=D.time and RDp.deletedfilesize<=CWp.wrotefilesize and RDp.deletedfilesize>0"`
 
 for i in ${QUERY}
 do
