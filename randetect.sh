@@ -19,14 +19,15 @@
 #SLDPATH='/var/log/synolog/'
 SLDPATH='/home/antoine/SynologyNAS_RansomwareAnalyzer/'
 SLDNAME='.SMBXFERDB'
-XMIN=1
-YMIN=3
 RANGE=2000
 BAN_LIMIT=50
 
 
-function synology_log_query() {
-	IFS=$'\n'
+# Create, write, delete log type query
+function synology_log_query_cwd() {
+	local IFS=$'\n'
+	local XMIN=1
+	local YMIN=3
 	QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
 	SELECT D.ip
 	FROM
@@ -99,9 +100,9 @@ function parse_ip_from_query() {
 
 
 function main() {
-	synology_log_query
-	BLACKLIST=()
-	COUNTER=()
+	synology_log_query_cwd
+	local BLACKLIST=()
+	local COUNTER=()
 	for ip in ${QUERY}
 	do
 		parse_ip_from_query $ip
