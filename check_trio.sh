@@ -3,9 +3,10 @@ IFS=$'\n'
 #SLDPATH='/var/log/synolog/'
 SLDPATH='/home/antoine/SynologyNAS_RansomwareAnalyzer/'
 SLDNAME='.SMBXFERDB'
-xmin=1
-ymin=3
-range=2000
+XMIN=1
+YMIN=3
+RANGE=2000
+BAN_LIMIT=50
 QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
 SELECT D.ip
 FROM
@@ -19,7 +20,7 @@ FROM
 				SELECT	*
 				FROM	logs
 				WHERE	id > (
-						SELECT MAX(id) - $range
+						SELECT MAX(id) - $RANGE
 						FROM	logs
 						WHERE	isdir = 0
 					)
@@ -28,14 +29,14 @@ FROM
 				SELECT	*
 				FROM	logs
 				WHERE	id > (
-						SELECT	MAX(id) - $range
+						SELECT	MAX(id) - $RANGE
 						FROM	logs
 						WHERE	isdir = 0
 					)
 	     		) B
 		WHERE	A.filename = B.filename
 			AND A.cmd = 'create' AND B.cmd = 'write'
-			AND createtime <= writetime AND (writetime - createtime) <= $xmin
+			AND createtime <= writetime AND (writetime - createtime) <= $XMIN
 	) CWp,
 	(
 		SELECT	*
@@ -43,30 +44,32 @@ FROM
 		WHERE	isdir = 0 AND cmd = 'delete'
 	) D
 WHERE	CWp.writetime <= D.time
-	AND (D.time - CWp.writetime) <= $ymin
+	AND (D.time - CWp.writetime) <= $YMIN
 	AND D.filesize <= CWp.wrotefilesize
 ;"`
 BLACKLIST=()
 COUNTER=()
 
-for i in ${QUERY}
+for ip in ${QUERY}
 do
-	echo $i
-	if [[ "${BLACKLIST[@]}" =~ "$i" ]];
+	#echo $ip
+	if [[ "${BLACKLIST[@]}" =~ "$ip" ]];
 	then
-		count=0
-	#	echo ${#BLACKLIST[@]}
-		while [ $count -lt ${#BLACKLIST[@]} ]
+		index=0
+		while [ $index -lt ${#BLACKLIST[@]} ]
 		do
-	#		printf "\n${BLACKLIST[$count]}\n"
-			if [ "${BLACKLIST[$count]}" = "$i" ]
+			if [ "${BLACKLIST[$index]}" = "$ip" ]
 			then
-				echo "BAN: index:" $count
+				((++COUNTER[$index]))
+				if [ ${COUNTER[$index]} -ge $BAN_LIMIT ]
+				then
+					echo BAN: $ip, ${COUNTER[$index]}
+				fi
+				#echo "BAN: index:" $index "COUNTER:${COUNTER[$index]}"
 			fi
-			((++count))
+			((++index))
 		done
-	    # whatever you want to do when array contains value
 	else
-		BLACKLIST+=($i)
+		BLACKLIST+=($ip)
 	fi
 done
