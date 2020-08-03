@@ -77,8 +77,6 @@ function add_to_blacklist() {
 
 
 function parse_ip_from_query() {
-	BLACKLIST=()
-	COUNTER=()
 	local index=0
 	if [[ "${BLACKLIST[@]}" =~ "$1" ]];
 	then
@@ -102,6 +100,8 @@ function parse_ip_from_query() {
 
 function main() {
 	synology_log_query
+	BLACKLIST=()
+	COUNTER=()
 	for ip in ${QUERY}
 	do
 		parse_ip_from_query $ip
