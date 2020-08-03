@@ -1,5 +1,4 @@
 #!/bin/bash
-
 IFS=$'\n'
 #SLDPATH='/var/log/synolog/'
 SLDPATH='/home/antoine/SynologyNAS_RansomwareAnalyzer/'
@@ -7,7 +6,6 @@ SLDNAME='.SMBXFERDB'
 xmin=1
 ymin=3
 range=2000
-
 QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
 SELECT D.ip
 FROM
@@ -48,11 +46,27 @@ WHERE	CWp.writetime <= D.time
 	AND (D.time - CWp.writetime) <= $ymin
 	AND D.filesize <= CWp.wrotefilesize
 ;"`
-
 BLACKLIST=()
+COUNTER=()
 
 for i in ${QUERY}
 do
 	echo $i
-	
+	if [[ "${BLACKLIST[@]}" =~ "$i" ]];
+	then
+		count=0
+	#	echo ${#BLACKLIST[@]}
+		while [ $count -lt ${#BLACKLIST[@]} ]
+		do
+	#		printf "\n${BLACKLIST[$count]}\n"
+			if [ "${BLACKLIST[$count]}" = "$i" ]
+			then
+				echo "BAN: index:" $count
+			fi
+			((++count))
+		done
+	    # whatever you want to do when array contains value
+	else
+		BLACKLIST+=($i)
+	fi
 done
