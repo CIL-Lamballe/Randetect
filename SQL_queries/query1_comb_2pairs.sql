@@ -1,11 +1,8 @@
 -- First version of the selection matching 2 pairs
-SELECT
-	*
+SELECT	*
 FROM
 	(
-		SELECT
-			A.ip,
-			A.username,
+		SELECT	A.ip, A.username,
 			A.filename,
 			B.filesize AS wrotefilesize,
 			A.cmd,
@@ -42,49 +39,27 @@ WHERE
 ;
 
 -- Second version of the selection, using range:
-SELECT
-	*
+SELECT	*
 FROM
 	(
-		SELECT
-			A.ip,
-			A.username,
-			A.filename,
+		SELECT	A.ip, A.username, A.filename,
 			B.filesize AS wrotefilesize,
-			A.cmd,
-			A.time,
-			B.cmd,
+			A.cmd, A.time, B.cmd,
 			B.time AS btime
 		FROM
 			(
-				SELECT
-					*
-				FROM
-					logs
-				WHERE
-					id > (
-						SELECT
-							MAX(id) - $range
-						FROM
-							logs
-						WHERE
-							isdir = 0
-					)
+				SELECT	*
+				FROM	logs
+				WHERE	id > (	SELECT	MAX(id) - $range
+						FROM	logs
+						WHERE	isdir = 0 )
 			) A,
 			(
-				SELECT
-					*
-				FROM
-					logs
-				WHERE
-					id > (
-						SELECT
-							MAX(id) - $range
-						FROM
-							logs
-						WHERE
-							isdir = 0
-					)
+				SELECT	*
+				FROM	logs
+				WHERE	id > (	SELECT	MAX(id) - $range
+						FROM	logs
+						WHERE	isdir = 0 )
 			) B
 		WHERE
 			A.isdir = 0 AND B.isdir = 0
@@ -92,43 +67,24 @@ FROM
 			AND A.cmd = 'create' AND B.cmd='write'
 			AND A.time <= B.time AND (B.time - A.time) <= $xmin
 	) CWp, (
-		SELECT
-			C.filename,
+		SELECT	C.filename,
 			D.filesize AS deletedfilesize,
-			C.cmd,
-			C.time AS ctime,
-			D.cmd,
-			D.time
+			C.cmd, C.time AS ctime,
+			D.cmd, D.time
 		FROM
 			(
-				SELECT
-					*
-				FROM
-					logs
-				WHERE
-					id > (
-						SELECT
-							MAX(id) - $range
-						FROM
-							logs
-						WHERE
-							isdir = 0
-					)
+				SELECT	*
+				FROM	logs
+				WHERE	id > (	SELECT	MAX(id) - $range
+						FROM	logs
+						WHERE	isdir = 0 )
 			) C,
 			(
-				SELECT
-					*
-				FROM
-					logs
-				WHERE
-					id > (
-						SELECT
-							MAX(id) - $range
-						FROM
-							logs
-						WHERE
-							isdir = 0
-					)
+				SELECT	*
+				FROM	logs
+				WHERE	id > (	SELECT	MAX(id) - $range
+						FROM	logs
+						WHERE	isdir = 0 )
 			) D
 		WHERE
 			C.isdir = 0 AND D.isdir = 0
