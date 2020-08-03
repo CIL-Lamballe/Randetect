@@ -22,6 +22,7 @@ SLDNAME='.SMBXFERDB'
 RANGE=2000
 BAN_LIMIT=50
 ERROR_LOG="/var/log/randetect.log"
+BAN=()
 
 
 function synology_log_query_type1() {
@@ -146,14 +147,13 @@ function classify_ip() {
 				((++COUNTER[$index]))
 				if [ ${COUNTER[$index]} -ge $BAN_LIMIT ]
 				then
-					
-					echo "BAN: $1, ${COUNTER[$index]}"
+					ban $1 $2
 				fi
 			fi
 			((++index))
 		done
 	else
-		add_to_blacklist $1
+		BLACKLIST+=($1)
 	fi
 }
 
@@ -187,10 +187,12 @@ function parse_ip_from_query_type2() {
 }
 
 
-function add_to_blacklist() {
-	BLACKLIST+=($1)
-#	printf "\nBlacklist: $1\n"
+function ban() {
 	# Here is the iptable ban
+	if [[ ! "${BAN[@]}" =~ "$1" ]];
+	then
+		BAN+=($1)
+	fi
 }
 
 
@@ -204,7 +206,7 @@ function main() {
 	synology_log_query_type2
 	parse_ip_from_query_type2
 
-	printf "\nBlacklist:\n${BLACKLIST[@]}\n"
+	echo ${BAN[@]}
 }
 
 
