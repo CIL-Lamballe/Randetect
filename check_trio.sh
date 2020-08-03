@@ -1,4 +1,21 @@
 #!/bin/bash
+#
+# Script Name: randetect.sh
+#
+# Author: Antoine BARTHELEMY, Idrisse KARAMI
+# Date : 2020-08-03
+#
+# Description: The following script parse an SQL query from a NAS Synology log file called SMBXFERDB
+#              and classify user activity into supicious or non-suspicious.
+#              Suspicious IPs are blacklisted and send to iptables for ban.
+#
+# Run Information: This script is run automatically as a deamon every start up from a crontab entry.
+#
+# Error Log: Any errors or output associated with the script can be found in ?(not yet specified)
+#
+
+
+
 IFS=$'\n'
 #SLDPATH='/var/log/synolog/'
 SLDPATH='/home/antoine/SynologyNAS_RansomwareAnalyzer/'
@@ -50,8 +67,7 @@ WHERE	CWp.writetime <= D.time
 BLACKLIST=()
 COUNTER=()
 
-for ip in ${QUERY}
-do
+function parse_ip_from_query() {
 	#echo $ip
 	if [[ "${BLACKLIST[@]}" =~ "$ip" ]];
 	then
@@ -72,4 +88,12 @@ do
 	else
 		BLACKLIST+=($ip)
 	fi
-done
+}
+
+function main() {
+	for ip in ${QUERY}
+	do
+		#echo $ip
+		parse_ip_from_query $ip
+	done
+}
