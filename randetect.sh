@@ -23,8 +23,7 @@ RANGE=2000
 BAN_LIMIT=50
 
 
-# Create, write, delete log type query
-function synology_log_query_cwd() {
+function synology_log_query() {
 	local IFS=$'\n'
 	local XMIN=1
 	local YMIN=3
@@ -100,7 +99,7 @@ function parse_ip_from_query() {
 
 
 function main() {
-	synology_log_query_cwd
+	synology_log_query
 	local BLACKLIST=()
 	local COUNTER=()
 	for ip in ${QUERY}
