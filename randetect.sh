@@ -5,9 +5,9 @@
 # Author: Antoine BARTHELEMY, Idrisse KARAMI
 # Date : 2020-08-03
 #
-# Description: The following script parse an SQL query from a NAS Synology log file called SMBXFERDB
+# Description: The following script parse a NAS Synology log file called SMBXFERDB
 #              and classify user activity into supicious or non-suspicious.
-#              Suspicious IPs are blacklisted and send to iptables for ban.
+#              Suspicious IPs are blacklisted and sent to iptables for ban.
 #
 # Run Information: This script is run automatically as a deamon every start up from a crontab entry.
 #
