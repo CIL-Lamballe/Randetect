@@ -108,4 +108,5 @@ function main() {
 	done
 }
 
-main
+
+while true; do main ; sleep 2; done
