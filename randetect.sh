@@ -23,6 +23,8 @@ XMIN=1
 YMIN=3
 RANGE=2000
 BAN_LIMIT=50
+BLACKLIST=()
+COUNTER=()
 QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
 SELECT D.ip
 FROM
@@ -64,14 +66,17 @@ WHERE	CWp.writetime <= D.time
 	AND D.filesize <= CWp.wrotefilesize
 ;"`
 
-BLACKLIST=()
-COUNTER=()
+
+function add_to_blacklist() {
+	printf "\nBlacklist\n"
+	# Here is the iptable ban
+}
+
 
 function parse_ip_from_query() {
-	#echo $ip
+	local index=0
 	if [[ "${BLACKLIST[@]}" =~ "$1" ]];
 	then
-		index=0
 		while [ $index -lt ${#BLACKLIST[@]} ]
 		do
 			if [ "${BLACKLIST[$index]}" = "$1" ]
@@ -79,9 +84,8 @@ function parse_ip_from_query() {
 				((++COUNTER[$index]))
 				if [ ${COUNTER[$index]} -ge $BAN_LIMIT ]
 				then
-					echo BAN: $1, ${COUNTER[$index]}
+					echo "BAN: $1, ${COUNTER[$index]}"
 				fi
-				#echo "BAN: index:" $index "COUNTER:${COUNTER[$index]}"
 			fi
 			((++index))
 		done
@@ -90,10 +94,10 @@ function parse_ip_from_query() {
 	fi
 }
 
+
 function main() {
 	for ip in ${QUERY}
 	do
-		#echo $ip
 		parse_ip_from_query $ip
 	done
 }
