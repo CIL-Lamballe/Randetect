@@ -23,6 +23,7 @@ RANGE=2000
 BAN_LIMIT=50
 ERROR_LOG="/var/log/randetect.log"
 
+
 function synology_log_query_type1() {
 	local IFS=$'\n'
 	local XMIN=1
@@ -82,7 +83,21 @@ function synology_log_query_type2() {
 				B.filesize AS wrotefilesize,
 				A.cmd, A.time, B.cmd,
 				B.time AS btime
-			FROM	logs A, logs B
+			FROM
+				(
+					SELECT	*
+					FROM	logs
+					WHERE	id > (	SELECT	MAX(id) - $RANGE
+							FROM	logs
+							WHERE	isdir = 0 )
+				) A,
+				(
+					SELECT	*
+					FROM	logs
+					WHERE	id > (	SELECT	MAX(id) - $RANGE
+							FROM	logs
+							WHERE	isdir = 0 )
+				) B
 			WHERE	A.isdir = 0 AND B.isdir = 0
 				AND A.filename = B.filename
 				AND A.cmd = 'create' AND B.cmd='write'
@@ -93,7 +108,21 @@ function synology_log_query_type2() {
 				C.cmd,
 				C.time AS ctime,
 				D.cmd,	D.time
-			FROM	logs C, logs D
+			FROM
+				(
+					SELECT	*
+					FROM	logs
+					WHERE	id > (	SELECT	MAX(id) - $RANGE
+							FROM	logs
+							WHERE	isdir = 0 )
+				) C,
+				(
+					SELECT	*
+					FROM	logs
+					WHERE	id > (	SELECT	MAX(id) - $RANGE
+							FROM	logs
+							WHERE	isdir = 0 )
+				) D
 			WHERE	C.isdir = 0 AND D.isdir = 0
 				AND C.filename = D.filename
 				AND C.cmd = 'read' AND D.cmd = 'delete'
@@ -107,7 +136,6 @@ function synology_log_query_type2() {
 
 
 function classify_ip() {
-	echo $1
 	local index=0
 	if [[ "${BLACKLIST[@]}" =~ "$1" ]];
 	then
@@ -118,13 +146,14 @@ function classify_ip() {
 				((++COUNTER[$index]))
 				if [ ${COUNTER[$index]} -ge $BAN_LIMIT ]
 				then
+					
 					echo "BAN: $1, ${COUNTER[$index]}"
 				fi
 			fi
 			((++index))
 		done
 	else
-		BLACKLIST+=($1)
+		add_to_blacklist $1
 	fi
 }
 
@@ -159,21 +188,23 @@ function parse_ip_from_query_type2() {
 
 
 function add_to_blacklist() {
-	printf "\nBlacklist\n"
+	BLACKLIST+=($1)
+#	printf "\nBlacklist: $1\n"
 	# Here is the iptable ban
 }
 
 
 function main() {
-
 	local BLACKLIST=()
 	local COUNTER=()
 
-#	synology_log_query_type1
-#	parse_ip_from_query_type1
+	synology_log_query_type1
+	parse_ip_from_query_type1
 
 	synology_log_query_type2
 	parse_ip_from_query_type2
+
+	printf "\nBlacklist:\n${BLACKLIST[@]}\n"
 }
 
 
