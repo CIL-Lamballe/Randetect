@@ -14,8 +14,6 @@
 # Error Log: Any errors or output associated with the script can be found in ?(not yet specified)
 #
 
-
-
 IFS=$'\n'
 #SLDPATH='/var/log/synolog/'
 SLDPATH='/home/antoine/SynologyNAS_RansomwareAnalyzer/'
