@@ -21,9 +21,9 @@ SLDPATH='/home/antoine/SynologyNAS_RansomwareAnalyzer/'
 SLDNAME='.SMBXFERDB'
 RANGE=2000
 BAN_LIMIT=50
+ERROR_LOG="/var/log/randetect.log"
 
-
-function synology_log_query() {
+function synology_log_query_type1() {
 	local IFS=$'\n'
 	local XMIN=1
 	local YMIN=3
@@ -70,13 +70,44 @@ function synology_log_query() {
 }
 
 
-function add_to_blacklist() {
-	printf "\nBlacklist\n"
-	# Here is the iptable ban
+function synology_log_query_type2() {
+	local IFS=$'\n'
+	local XMIN=1
+	local YMIN=300
+	QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
+	SELECT	*
+	FROM
+		(
+			SELECT	A.ip, A.username, A.filename,
+				B.filesize AS wrotefilesize,
+				A.cmd, A.time, B.cmd,
+				B.time AS btime
+			FROM	logs A, logs B
+			WHERE	A.isdir = 0 AND B.isdir = 0
+				AND A.filename = B.filename
+				AND A.cmd = 'create' AND B.cmd='write'
+				AND A.time <= B.time AND (B.time - A.time) <= $XMIN
+		) CWp, (
+			SELECT	C.filename,
+				D.filesize AS deletedfilesize,
+				C.cmd,
+				C.time AS ctime,
+				D.cmd,	D.time
+			FROM	logs C, logs D
+			WHERE	C.isdir = 0 AND D.isdir = 0
+				AND C.filename = D.filename
+				AND C.cmd = 'read' AND D.cmd = 'delete'
+				AND C.time <= D.time AND (D.time - C.time) <= $YMIN
+		) RDp
+	WHERE	CWp.btime = RDp.ctime
+		AND RDp.deletedfilesize <= CWp.wrotefilesize
+		AND RDp.deletedfilesize > 0
+	;"`
 }
 
 
-function parse_ip_from_query() {
+function classify_ip() {
+	echo $1
 	local index=0
 	if [[ "${BLACKLIST[@]}" =~ "$1" ]];
 	then
@@ -98,14 +129,51 @@ function parse_ip_from_query() {
 }
 
 
-function main() {
-	synology_log_query
-	local BLACKLIST=()
-	local COUNTER=()
+function parse_ip_from_query_type1() {
 	for ip in ${QUERY}
 	do
-		parse_ip_from_query $ip
+		classify_ip $ip
 	done
+}
+
+
+function parse_ip_from_query_type2() {
+	local IFS=$'\n'
+	for line in ${QUERY}
+	do
+		filenameA=`echo $line | cut -d '|' -f3`
+		filenameC=`echo $line | cut -d '|' -f9`
+		if [ `echo $line | cut -d '|' -f4` -eq `echo $line | cut -d '|' -f10` ]
+		then
+			cksA=`cksum ${filenameA} 2>/dev/null`
+			cksC=`cksum ${filenameC} 2>/dev/null`
+			if [ $((${cksA[0]})) -ne $((${cksC[0]})) ]
+			then
+				classify_ip `echo $line | cut -d '|' -f1`
+			fi
+		else
+			classify_ip `echo $line | cut -d '|' -f1`
+		fi
+	done
+}
+
+
+function add_to_blacklist() {
+	printf "\nBlacklist\n"
+	# Here is the iptable ban
+}
+
+
+function main() {
+
+	local BLACKLIST=()
+	local COUNTER=()
+
+#	synology_log_query_type1
+#	parse_ip_from_query_type1
+
+	synology_log_query_type2
+	parse_ip_from_query_type2
 }
 
 

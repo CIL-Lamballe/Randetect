@@ -5,8 +5,7 @@ IFS=$'\n'
 SLDPATH='/home/antoine/SynologyNAS_RansomwareAnalyzer/'
 SLDNAME='.SMBXFERDB'
 xmin=1
-ymin=30
-range=2000
+ymin=300
 
 QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
 SELECT	*
@@ -16,25 +15,7 @@ FROM
 			B.filesize AS wrotefilesize,
 			A.cmd, A.time, B.cmd,
 			B.time AS btime
-		FROM
-			(
-				SELECT	*
-				FROM	logs
-				WHERE	id > (
-						SELECT	MAX(id) - $range
-						FROM	logs
-						WHERE	isdir = 0
-					)
-			) A,
-			(
-				SELECT	*
-				FROM	logs
-				WHERE	id > (
-						SELECT	MAX(id) - $range
-						FROM	logs
-						WHERE	isdir = 0
-					)
-			) B
+		FROM	logs A, logs B
 		WHERE	A.isdir = 0 AND B.isdir = 0
 			AND A.filename = B.filename
 			AND A.cmd = 'create' AND B.cmd='write'
@@ -45,25 +26,7 @@ FROM
 			C.cmd,
 			C.time AS ctime,
 			D.cmd,	D.time
-		FROM
-			(
-				SELECT	*
-				FROM	logs
-				WHERE	id > (
-						SELECT	MAX(id) - $range
-						FROM	logs
-						WHERE	isdir = 0
-					)
-			) C,
-			(
-				SELECT	*
-				FROM	logs
-				WHERE	id > (
-						SELECT	MAX(id) - $range
-						FROM	logs
-						WHERE	isdir = 0
-					)
-			) D
+		FROM	logs C, logs D
 		WHERE	C.isdir = 0 AND D.isdir = 0
 			AND C.filename = D.filename
 			AND C.cmd = 'read' AND D.cmd = 'delete'
