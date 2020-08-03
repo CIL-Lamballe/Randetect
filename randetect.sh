@@ -14,6 +14,7 @@
 # Error Log: Any errors or output associated with the script can be found in ?(not yet specified)
 #
 
+# Globals
 IFS=$'\n'
 #SLDPATH='/var/log/synolog/'
 SLDPATH='/home/antoine/SynologyNAS_RansomwareAnalyzer/'
@@ -67,24 +68,24 @@ COUNTER=()
 
 function parse_ip_from_query() {
 	#echo $ip
-	if [[ "${BLACKLIST[@]}" =~ "$ip" ]];
+	if [[ "${BLACKLIST[@]}" =~ "$1" ]];
 	then
 		index=0
 		while [ $index -lt ${#BLACKLIST[@]} ]
 		do
-			if [ "${BLACKLIST[$index]}" = "$ip" ]
+			if [ "${BLACKLIST[$index]}" = "$1" ]
 			then
 				((++COUNTER[$index]))
 				if [ ${COUNTER[$index]} -ge $BAN_LIMIT ]
 				then
-					echo BAN: $ip, ${COUNTER[$index]}
+					echo BAN: $1, ${COUNTER[$index]}
 				fi
 				#echo "BAN: index:" $index "COUNTER:${COUNTER[$index]}"
 			fi
 			((++index))
 		done
 	else
-		BLACKLIST+=($ip)
+		BLACKLIST+=($1)
 	fi
 }
 
@@ -95,3 +96,5 @@ function main() {
 		parse_ip_from_query $ip
 	done
 }
+
+main
