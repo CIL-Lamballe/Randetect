@@ -11,11 +11,14 @@
 #
 # Run Information: This script is run automatically as a deamon every start up from a crontab entry.
 #
-# Error Log: Any errors or output associated with the script can be found in ?(not yet specified)
+# Error Log: Any errors or output associated with the script can be found in /var/log/randetect
 #
 
-
 # Globals
+#LOGDIR="/var/log/randetect/"
+LOGDIR="${PWD}/"
+ERRLOG="error.log"
+OUTLOG="output.log"
 #SLDPATH='/var/log/synolog/'
 SLDPATH='/home/antoine/SynologyNAS_RansomwareAnalyzer/'
 SLDNAME='.SMBXFERDB'
@@ -227,6 +230,14 @@ function main() {
 	echo ${BAN[@]}
 }
 
+
+if [ ! -d "$LOGDIR" ]
+then
+	mkdir /var/log/randetect
+fi
+
+exec 1>>${LOGDIR}${OUTLOG}
+exec 2>>${LOGDIR}${ERRLOG}
 
 #while true; do main ; sleep 2; done
 main
