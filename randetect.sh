@@ -136,6 +136,22 @@ function synology_log_query_type2() {
 }
 
 
+function synology_log_query_type3() {
+	local IFS=$'\n'
+	local TIME=100
+	QUERY=`sqlite3 ${SLDPATH}${SLDNAME} "
+	SELECT	ip
+	FROM	logs
+	WHERE	id > (	SELECT	MAX(id) - $RANGE
+			FROM	logs
+			WHERE	isdir = 0 )
+		AND cmd = 'delete'
+		AND time > (	SELECT	MAX(time)
+				FROM	logs ) - $TIME
+	;"`
+}
+
+
 function classify_ip() {
 	local index=0
 	if [[ "${BLACKLIST[@]}" =~ "$1" ]];
@@ -197,17 +213,20 @@ function ban() {
 
 
 function main() {
-	local BLACKLIST=()
-	local COUNTER=()
-
 	synology_log_query_type1
 	parse_ip_from_query_type1
 
+	unset COUNTER
 	synology_log_query_type2
 	parse_ip_from_query_type2
+
+	unset COUNTER
+	synology_log_query_type3
+	parse_ip_from_query_type1
 
 	echo ${BAN[@]}
 }
 
 
-while true; do main ; sleep 2; done
+#while true; do main ; sleep 2; done
+main
