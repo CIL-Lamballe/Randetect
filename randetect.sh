@@ -215,7 +215,7 @@ function ban() {
 }
 
 
-function main() {
+function parse_queries() {
 	synology_log_query_type1
 	parse_ip_from_query_type1
 
@@ -241,7 +241,7 @@ exec 2>>${LOGDIR}${ERRLOG}
 
 while true
 do
-	main
+	parse_queries
 	cat ${LOGDIR}${OUTLOG} >> .tmp
 	cat .tmp | uniq > ${LOGDIR}${OUTLOG}
 	rm .tmp
