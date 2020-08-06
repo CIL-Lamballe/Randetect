@@ -239,5 +239,11 @@ fi
 exec 1>>${LOGDIR}${OUTLOG}
 exec 2>>${LOGDIR}${ERRLOG}
 
-#while true; do main ; sleep 2; done
-main
+while true
+do
+	main
+	cat ${LOGDIR}${OUTLOG} >> .tmp
+	cat .tmp | uniq > ${LOGDIR}${OUTLOG}
+	rm .tmp
+	sleep 2
+done
