@@ -1,7 +1,4 @@
 .*
 !/.gitignore
-!/target/release/randetect
-
-#Added by cargo
-
 /target
+!/target/release/randetect
