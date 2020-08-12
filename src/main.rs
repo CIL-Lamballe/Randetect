@@ -1,3 +1,9 @@
+use std::{thread, time};
+
 fn main() {
-    println!("Hello, world!");
+    let duration = time::Duration::from_millis(2000);
+    loop {
+        println!("Hello, world!");
+        thread::sleep(duration);
+    }
 }
