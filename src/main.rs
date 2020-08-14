@@ -10,9 +10,10 @@ struct User {
     attempt: i32,
 }
 
-fn hello(h: u16) -> u8 {
-    for i in 1..4 {
-        println!("Hello, world! {}", h - i);
+fn main() {
+    let duration = time::Duration::from_millis(2000);
+    loop {
+        println!("Hello, world!");
+        thread::sleep(duration);
     }
-    5
 }
