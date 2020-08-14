@@ -16,11 +16,3 @@ fn hello(h: u16) -> u8 {
     }
     5
 }
-
-fn main() {
-    let duration = time::Duration::from_millis(TIME);
-    loop {
-        hello(MAX_LOG);
-        thread::sleep(duration);
-    }
-}
