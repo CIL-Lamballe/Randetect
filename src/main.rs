@@ -1,9 +1,16 @@
 use std::{thread, time};
 
-const MAX_LOG: u16 = 2_000; // Maximum log parsed - LIFO.
-const TIME: u64 = 2_000; // Loop dealy in milliseconds.
-const DBPATH: &str = "/var/log/synolog/"; // Path to Synology logs.
-const DB: &str = ".SMBXFERDB"; // Database containing file logs.
+/* Maximum log parsed - LIFO. */
+const MAX_LOG: u16 = 2_000;
+
+/* Loop dealy in milliseconds. */
+const TIME: u64 = 2_000;
+
+/* Path to Synology logs. */
+const DBPATH: &str = "/var/log/synolog/";
+
+/* Database containing file logs. */
+const DB: &str = ".SMBXFERDB";
 
 enum ActivityType {
     Suspicious(i32),     // Containing nb of files manipulated.
