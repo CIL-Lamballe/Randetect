@@ -1,16 +1,8 @@
 use std::{thread, time};
 
-/* Maximum log parsed - LIFO. */
-const MAX_LOG: u16 = 2_000;
-
-/* Loop dealy in milliseconds. */
-const TIME: u64 = 2_000;
-
-/* Path to Synology logs. */
-const DBPATH: &str = "/var/log/synolog/";
-
-/* Database containing file logs. */
-const DB: &str = ".SMBXFERDB";
+mod alert;
+mod config;
+mod database;
 
 enum ActivityType {
     Suspicious(i32),     // Containing nb of files manipulated.
@@ -18,16 +10,23 @@ enum ActivityType {
     Normal,              // Normal user activity.
 }
 
+enum Ip {
+    V4(String),
+    V6(String),
+}
+
 struct User {
-    ip: String,
     username: String,
+    ip: Ip,
     kind: ActivityType,
 }
 
 fn main() {
-    let duration = time::Duration::from_millis(TIME);
+    let duration = time::Duration::from_millis(config::TIME);
     loop {
         println!("Hello, world!");
         thread::sleep(duration);
+        database::dir_move();
+        alert::sms::send();
     }
 }
