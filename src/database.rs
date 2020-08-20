@@ -8,6 +8,7 @@ const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB"; // For dev
 struct Log {
     username: String,
     ip: String,
+    dir: String,
 }
 
 pub fn suspicious_pairs() {}
@@ -35,6 +36,7 @@ pub fn huge_delete() -> Result<()> {
             Ok(Log {
                 username: row.get(0).unwrap(),
                 ip: row.get(1).unwrap(),
+                dir: String::new()
             })
         })
         .unwrap();
