@@ -23,15 +23,13 @@ mod database;
 //}
 
 fn main() {
-    let db = format!("{}{}", config::DBPATH, config::DBNAME);
-
     let duration = time::Duration::from_millis(config::TIME);
 
-    loop {
-        println!("Loop");
-        database::huge_delete(&db);
-        thread::sleep(duration);
-        //        database::dir_move();
-        //        alert::sms::send();
-    }
+    //  loop {
+    database::huge_delete();
+    //        database::dir_move();
+    //        alert::sms::send();
+
+    // thread::sleep(duration);
+    //  }
 }
