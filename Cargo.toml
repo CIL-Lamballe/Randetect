@@ -11,3 +11,6 @@ edition = "2018"
 [[bin]]
 name = "randetect"
 path = "src/main.rs"
+
+[profile.release]
+panic = 'abort'
