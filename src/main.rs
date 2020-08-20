@@ -1,5 +1,10 @@
 use std::{thread, time};
 
+extern crate rusqlite;
+
+use rusqlite::{Connection, Result};
+use rusqlite::NO_PARAMS;
+
 mod alert;
 mod config;
 mod database;
@@ -22,7 +27,9 @@ struct User {
 }
 
 fn main() {
+
     let duration = time::Duration::from_millis(config::TIME);
+
     loop {
         println!("Hello, world!");
         thread::sleep(duration);
