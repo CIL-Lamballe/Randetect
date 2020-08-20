@@ -21,18 +21,15 @@ pub fn huge_delete() -> Result<()> {
     let mut stmt = conn
         .prepare(
             "SELECT	username, ip
-	FROM	logs",
+	FROM	logs
+    	WHERE	id > (	SELECT	MAX(id) - 2500
+    			FROM	logs
+    			WHERE	isdir = 0 )
+    		AND cmd = 'delete'
+    		AND time > (	SELECT	MAX(time)
+    				FROM	logs ) - 100000;", // Values to be changed, here just for tests
         )
         .unwrap();
-    //	WHERE	id > (	SELECT	MAX(id) - 2500
-    //			FROM	logs
-    //			WHERE	isdir = 0 )
-    //		AND cmd = 'delete'
-    //		AND time > (	SELECT	MAX(time)
-    //				FROM	logs ) - 3;",
-    //      )
-    //    .unwrap();
-    println!("Prepare Query");
     let logs = stmt
         .query_map(params![], |row| {
             Ok(Log {
@@ -43,9 +40,8 @@ pub fn huge_delete() -> Result<()> {
         .unwrap();
 
     for i in logs {
-        println!("Line: {:?}", i);
+        println!("Here treat log: Line: {:?}", i);
     }
-    println!("Done");
     Ok(())
 }
 
