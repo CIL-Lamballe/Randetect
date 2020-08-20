@@ -10,7 +10,7 @@ pub const TIME: u64 = 2_000;
 
 /* Path to Synology logs database */
 //pub const DBPATH: &str = "/var/log/synolog/";
-pub const DBPATH: &str = "/home/antoine/RansomwareDetector_SynologyNAS"; // For dev
+pub const DBPATH: &str = "/home/antoine/RanDetect/"; // For dev
 pub const DBNAME: &str = ".SMBXFERDB";
 
 /* Randetect error log files */
