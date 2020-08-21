@@ -144,7 +144,7 @@ pub fn select(stmt: &str) -> Vec<Log> {
     let mut relation: Vec<Log> = Vec::new();
     for each in logs {
         match each {
-            Ok(t) => relation.push(t).unwrap(),
+            Ok(t) => relation.push(t),
             Err(e) => (),
         }
     }
