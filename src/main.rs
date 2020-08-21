@@ -1,5 +1,4 @@
 //use std::{thread, time};
-use std::time;
 
 mod query;
 
@@ -18,10 +17,12 @@ const TIME: u64 = 2_000;
 //}
 
 fn main() {
-    let duration = time::Duration::from_millis(TIME);
+    //let duration = time::Duration::from_millis(TIME);
     //  loop {
-    		query::select(query::MOVE);
-    //        database::dir_move();
+    query::select(query::MOVE);
+    query::select(query::DELETE);
+    query::select(query::SUSPICIOUS_CWD);
+    query::select(query::SUSPICIOUS_CRWD);
     //        alert::sms::send();
 
     // thread::sleep(duration);

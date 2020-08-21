@@ -7,7 +7,7 @@ const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB"; // For dev
 pub struct Log {
     username: String,
     ip: String,
-    dir: String,
+    dir: Result<String>,
 }
 
 pub static DELETE: &str = "
@@ -21,7 +21,7 @@ pub static DELETE: &str = "
             FROM logs ) - 100
         ;";
 
-pub static SUSPICIOUS: &str = "
+pub static SUSPICIOUS_CWD: &str = "
     SELECT D.username, D.ip
     FROM
     (
@@ -60,10 +60,10 @@ pub static SUSPICIOUS: &str = "
      WHERE    CWp.writetime <= D.time
      AND (D.time - CWp.writetime) <= 3
      AND D.filesize <= CWp.wrotefilesize
+    ;";
 
-     UNION
-
-     SELECT    *
+pub static SUSPICIOUS_CRWD: &str = "
+     SELECT *
      FROM
      (
       SELECT    A.ip, A.username, A.filename,
@@ -132,17 +132,17 @@ pub static MOVE: &str = "
 pub fn select(stmt: &str) {
     let conn = Connection::open(DB).unwrap();
     println!("Connect");
-     let mut stmt = conn.prepare(stmt).unwrap();
+    let mut stmt = conn.prepare(stmt).unwrap();
     let logs = stmt
         .query_map(params![], |row| {
             Ok(Log {
                 username: row.get(0).unwrap(),
                 ip: row.get(1).unwrap(),
-                dir: row.get(2).unwrap(),
+                dir: row.get(2),
             })
         })
         .unwrap();
-     for i in logs {
-        println!("Here treat log: Line: {:?}", i);
-    }
+    //     for i in logs {
+    //      println!("Here treat log: Line: {:?}", i);
+    //}
 }
