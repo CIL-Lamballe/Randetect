@@ -1,4 +1,5 @@
-use std::{thread, time};
+//use std::{thread, time};
+use std::time;
 
 mod query;
 
@@ -18,9 +19,8 @@ const TIME: u64 = 2_000;
 
 fn main() {
     let duration = time::Duration::from_millis(TIME);
-
     //  loop {
-    //		db::query::select(db::query::huge_delete::stmt);
+    		query::select(query::MOVE);
     //        database::dir_move();
     //        alert::sms::send();
 
