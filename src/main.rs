@@ -1,21 +1,15 @@
-use rusqlite::{Connection, Result, NO_PARAMS};
 use std::{thread, time};
 
-mod alert;
-mod config;
-mod database;
+mod query;
+
+/* Loop dealy in milliseconds */
+const TIME: u64 = 2_000;
 
 //enum ActivityType {
 //    Suspicious(i32),     // Containing nb of files manipulated.
 //    Misbehaving(String), // Contaning name of directory been moved.
 //    Normal,              // Normal user activity.
 //}
-//
-//enum Ip {
-//    V4(String),
-//    V6(String),
-//}
-//
 //struct User {
 //    username: String,
 //    ip: Ip,
@@ -23,10 +17,10 @@ mod database;
 //}
 
 fn main() {
-    let duration = time::Duration::from_millis(config::TIME);
+    let duration = time::Duration::from_millis(TIME);
 
     //  loop {
-    database::huge_delete();
+    //		db::query::select(db::query::huge_delete::stmt);
     //        database::dir_move();
     //        alert::sms::send();
 
