@@ -1,12 +1,24 @@
+use rusqlite::{params, Connection, Result};
+
+//const DB: &str = "/var/log/synolog/.SMBXFERDB";
+const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB"; // For dev
+
+#[derive(Debug)]
+pub struct Log {
+    username: String,
+    ip: String,
+    dir: String,
+}
+
 pub static DELETE: &str = "
     SELECT username, ip
-    FROM    logs
-    WHERE    id > (    SELECT    MAX(id) - 2500
-            FROM    logs
-            WHERE    isdir = 0 )
-        AND cmd = 'delete'
-    AND time > (    SELECT    MAX(time)
-            FROM    logs ) - 100
+    FROM   logs
+    WHERE  id > ( SELECT MAX(id) - 2500
+                  FROM logs
+                  WHERE isdir = 0 )
+           AND cmd = 'delete'
+           AND time > ( SELECT MAX(time)
+            FROM logs ) - 100
         ;";
 
 pub static SUSPICIOUS: &str = "
@@ -116,3 +128,21 @@ pub static MOVE: &str = "
         AND cmd = 'move'
         AND isdir = 1
     ;";
+
+pub fn select(stmt: &str) {
+    let conn = Connection::open(DB).unwrap();
+    println!("Connect");
+     let mut stmt = conn.prepare(stmt).unwrap();
+    let logs = stmt
+        .query_map(params![], |row| {
+            Ok(Log {
+                username: row.get(0).unwrap(),
+                ip: row.get(1).unwrap(),
+                dir: row.get(2).unwrap(),
+            })
+        })
+        .unwrap();
+     for i in logs {
+        println!("Here treat log: Line: {:?}", i);
+    }
+}
