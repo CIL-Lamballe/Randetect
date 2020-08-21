@@ -22,7 +22,7 @@ fn main() {
     query::select(query::MOVE);
     query::select(query::DELETE);
     query::select(query::SUSPICIOUS_CWD);
-    query::select(query::SUSPICIOUS_CRWD);
+  //  query::select(query::SUSPICIOUS_CRWD);
     //        alert::sms::send();
 
     // thread::sleep(duration);
