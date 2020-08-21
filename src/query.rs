@@ -129,9 +129,8 @@ pub static MOVE: &str = "
         AND isdir = 1
     ;";
 
-pub fn select(stmt: &str) {
+pub fn select(stmt: &str) -> Vec<Log> {
     let conn = Connection::open(DB).unwrap();
-    println!("Connect");
     let mut stmt = conn.prepare(stmt).unwrap();
     let logs = stmt
         .query_map(params![], |row| {
@@ -142,7 +141,12 @@ pub fn select(stmt: &str) {
             })
         })
         .unwrap();
-    //     for i in logs {
-    //      println!("Here treat log: Line: {:?}", i);
-    //}
+    let mut relation: Vec<Log> = Vec::new();
+    for each in logs {
+        match each {
+            Ok(t) => relation.push(t).unwrap(),
+            Err(e) => (),
+        }
+    }
+    relation
 }
