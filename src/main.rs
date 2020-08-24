@@ -1,7 +1,7 @@
 //use std::{thread, time};
 
-mod query;
 mod alert;
+mod query;
 
 /* Loop dealy in milliseconds */
 const TIME: u64 = 2_000;
@@ -15,7 +15,7 @@ fn main() {
 
     alert::log_user(qmove);
 
-  //  query::select(query::SUSPICIOUS_CRWD);
+    //  query::select(query::SUSPICIOUS_CRWD);
     //        alert::sms::send();
 
     // thread::sleep(duration);
