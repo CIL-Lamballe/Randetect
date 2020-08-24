@@ -38,7 +38,8 @@ pub fn log_user(entry: Vec<Log>, mut users: HashMap<String, User>, query: QType)
                         Vec::new()
                 },
                 kind: { match query {
-                    QType::Delete => ActivityType::Normal,
+                    QType::Move => ActivityType::Misbehaving(String::from("DIRNAME")),
+                    QType::Delete | QType::SuspiciousCwd => ActivityType::Suspicious(42),
                     _ => ActivityType::Normal,
                 } 
                    // if !map.get(&relation.kind) let mut k = Vec::new();
