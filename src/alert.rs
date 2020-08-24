@@ -1,7 +1,7 @@
 //use std::fs::File;
 //use std::io;
-use std::collections::HashMap;
 use crate::query::Log;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 enum ActivityType {
@@ -20,18 +20,22 @@ pub struct User {
 /* Maximum suspicious action limit */
 pub const BAN_LIMIT: u16 = 50;
 
-
-pub fn log_user(entry: Vec<Log>, mut users: HashMap<String, User>) {
+pub fn log_user(entry: Vec<Log>, mut users: HashMap<String, User>) -> HashMap<String, User> {
     for relation in entry {
-        users.insert(relation.get_username(), User {
-            username: relation.get_username(),
-            ip: { let mut v = Vec::new(); v.push(relation.get_ip()); v },
-            kind: ActivityType::Normal,
-        });
+        users.insert(
+            relation.get_username(),
+            User {
+                username: relation.get_username(),
+                ip: {
+                    let mut v = Vec::new();
+                    v.push(relation.get_ip());
+                    v
+                },
+                kind: ActivityType::Normal,
+            },
+        );
     }
-    for guy in users.iter() {
-        println!("Calling {:?}", guy);
-    }
+    users
 }
 
 pub mod sms {
