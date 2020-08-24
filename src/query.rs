@@ -10,6 +10,12 @@ pub struct Log {
     dir: Result<String>,
 }
 
+impl Log {
+    pub fn get_username(&self) -> &str {
+        &self.username
+    }
+}
+
 pub static DELETE: &str = "
     SELECT username, ip
     FROM   logs
