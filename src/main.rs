@@ -19,10 +19,10 @@ fn main() {
 
     let list = alert::log_user(qmove, list, query::QType::Move);
     let list = alert::log_user(qdelete, list, query::QType::Delete);
-    let list = alert::log_user(qcwd, list, query::QType::SuspiciousCwd);
+ //   let list = alert::log_user(qcwd, list, query::QType::SuspiciousCwd);
 
     for user in list.iter() {
-        println!("Calling {:?}", user);
+        println!("List= {:?}", user);
     }
     //        alert::sms::send();
 
