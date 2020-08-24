@@ -28,12 +28,13 @@ pub fn log_user(entry: Vec<Log>, mut users: HashMap<String, User>, query: QType)
             User {
                 ip: {
                     let u = users.get(&relation.get_username());
-                    println!("ip {:?}", users);
+                    println!("ip {:?}", u);
+                    println!("pi {:?}", relation);
                    // println!("ip {:?}", ip);
                   //  match u {
-                   //     Some(u) => println!("ip:{:?}", u.ip),
-                    //    None => { let v = Vec::new(); v.push(u.ip),
-                  //  }
+                   //     Some(u) => v.push(u.ip), //println!("ip {:?}", u),
+                    //    None => { let v = Vec::new(); v.push(u.ip); v },
+                   // }
                         Vec::new()
                 },
                 kind: { match query {
