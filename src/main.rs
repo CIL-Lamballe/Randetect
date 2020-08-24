@@ -8,16 +8,22 @@ mod query;
 const TIME: u64 = 2_000;
 
 fn main() {
-    let mut list: HashMap<String, alert::User> = HashMap::new();
+    let list: HashMap<String, alert::User> = HashMap::new();
     //let duration = time::Duration::from_millis(TIME);
-    //  loop {
+
+    // loop {
     let qmove = query::select(query::MOVE);
     let qdelete = query::select(query::DELETE);
+    //    let qcrwd = query::select(query::SUSPICIOUS_CRWD);
     let qcwd = query::select(query::SUSPICIOUS_CWD);
 
-    alert::log_user(qmove, list);
+    let list = alert::log_user(qmove, list);
+    let list = alert::log_user(qdelete, list);
+    let list = alert::log_user(qcwd, list);
 
-    //  query::select(query::SUSPICIOUS_CRWD);
+    for user in list.iter() {
+        println!("Calling {:?}", user);
+    }
     //        alert::sms::send();
 
     // thread::sleep(duration);
