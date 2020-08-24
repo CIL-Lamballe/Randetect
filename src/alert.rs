@@ -1,6 +1,7 @@
 //use std::fs::File;
 //use std::io;
 use crate::query::Log;
+use crate::query::QType;
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -21,7 +22,7 @@ pub struct User {
 /* Maximum suspicious action limit */
 pub const BAN_LIMIT: u16 = 50;
 
-pub fn log_user(entry: Vec<Log>, mut users: HashMap<String, User>) -> HashMap<String, User> {
+pub fn log_user(entry: Vec<Log>, mut users: HashMap<String, User>, query: QType) -> HashMap<String, User> {
     for relation in entry {
         users.insert(
             relation.get_username(),
@@ -36,7 +37,10 @@ pub fn log_user(entry: Vec<Log>, mut users: HashMap<String, User>) -> HashMap<St
                   //  }
                         Vec::new()
                 },
-                kind: { ActivityType::Normal
+                kind: { match query {
+                    QType::Delete => ActivityType::Normal,
+                    _ => ActivityType::Normal,
+                } 
                    // if !map.get(&relation.kind) let mut k = Vec::new();
                    // v.push()
                  },
