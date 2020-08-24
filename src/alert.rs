@@ -4,7 +4,7 @@ use crate::query::Log;
 use std::collections::HashMap;
 
 #[derive(Debug)]
-enum ActivityType {
+pub enum ActivityType {
     Suspicious(i32),     // Containing nb of files manipulated.
     Misbehaving(String), // Contaning name of directory been moved.
     Normal,              // Normal user activity.
@@ -15,6 +15,7 @@ pub struct User {
     pub username: String,
     ip: Vec<String>,
     kind: ActivityType,
+  //  kind: Vec<ActivityType>,
 }
 
 /* Maximum suspicious action limit */
@@ -27,11 +28,18 @@ pub fn log_user(entry: Vec<Log>, mut users: HashMap<String, User>) -> HashMap<St
             User {
                 username: relation.get_username(),
                 ip: {
-                    let mut v = Vec::new();
-                    v.push(relation.get_ip());
-                    v
+                    let ip = users.get(&relation.get_username());
+                    println!("ip {:?}", ip);
+                 //   match ip {
+                 //       None => { let mut ip = Vec::new(); ip.push(relation.get_ip()); ip},
+                 //       Some(ip) => { ip.push(relation.get_ip()); ip },
+                  //  }
+                        Vec::new()
                 },
-                kind: ActivityType::Normal,
+                kind: { ActivityType::Normal
+                   // if !map.get(&relation.kind) let mut k = Vec::new();
+                   // v.push()
+                 },
             },
         );
     }
