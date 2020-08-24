@@ -12,16 +12,16 @@ pub struct Log {
 
 impl Log {
     pub fn get_username(&self) -> String {
-        String::from(self.username)
+        String::from(&self.username)
     }
-    
+
     pub fn get_ip(&self) -> String {
-        String::from(self.ip)
+        String::from(&self.ip)
     }
 
     pub fn get_dir(&self) -> String {
-        match self.dir {
-            Ok(f) => f,
+        match &self.dir {
+            Ok(f) => String::from(f),
             Err(e) => String::from("empty"),
         }
     }

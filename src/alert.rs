@@ -1,7 +1,7 @@
 //use std::fs::File;
 //use std::io;
-use crate::query::Log;
 use std::collections::HashMap;
+use crate::query::Log;
 
 #[derive(Debug)]
 enum ActivityType {
@@ -20,14 +20,13 @@ pub struct User {
 /* Maximum suspicious action limit */
 pub const BAN_LIMIT: u16 = 50;
 
-static mut users: HashMap<String, User> = HashMap::new();
 
-pub fn log_user(entry: Vec<Log>) {
+pub fn log_user(entry: Vec<Log>, mut users: HashMap<String, User>) {
     for relation in entry {
         users.insert(relation.get_username(), User {
             username: relation.get_username(),
-            ip: Vec[relation.get_ip()],
-            kind: Normal,
+            ip: { let mut v = Vec::new(); v.push(relation.get_ip()); v },
+            kind: ActivityType::Normal,
         });
     }
     for guy in users.iter() {
@@ -42,7 +41,7 @@ pub mod sms {
 pub mod email {
 
     pub fn send() -> Result<std::fs::File, std::io::Error> {
-        let mut f = std::fs::File::open("email.txt")?;
+        let f = std::fs::File::open("email.txt")?;
         Ok(f)
     }
 }
