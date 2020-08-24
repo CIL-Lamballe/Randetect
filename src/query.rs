@@ -11,8 +11,8 @@ pub struct Log {
 }
 
 impl Log {
-    pub fn get_username(&self) -> &str {
-        &self.username
+    pub fn get_username(&self) -> String {
+        String::from(self.username)
     }
 }
 
