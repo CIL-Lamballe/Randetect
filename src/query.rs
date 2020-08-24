@@ -27,6 +27,14 @@ impl Log {
     }
 }
 
+#[derive(Debug)]
+pub enum QType {
+    Delete,
+    SuspiciousCwd,
+    SuspiciousCrwd,
+    Move,
+}
+
 pub static DELETE: &str = "
     SELECT username, ip
     FROM   logs

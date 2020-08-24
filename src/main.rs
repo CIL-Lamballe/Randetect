@@ -17,9 +17,9 @@ fn main() {
     //    let qcrwd = query::select(query::SUSPICIOUS_CRWD);
     let qcwd = query::select(query::SUSPICIOUS_CWD);
 
-    let list = alert::log_user(qmove, list);
-    let list = alert::log_user(qdelete, list);
-    let list = alert::log_user(qcwd, list);
+    let list = alert::log_user(qmove, list, query::QType::Move);
+    let list = alert::log_user(qdelete, list, query::QType::Delete);
+    let list = alert::log_user(qcwd, list, query::QType::SuspiciousCwd);
 
     for user in list.iter() {
         println!("Calling {:?}", user);
