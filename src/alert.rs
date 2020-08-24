@@ -13,7 +13,7 @@ pub enum ActivityType {
 
 #[derive(Debug)]
 pub struct User {
-    pub username: String,
+  //  pub username: String,
     ip: Vec<String>,
     kind: ActivityType,
   //  kind: Vec<ActivityType>,
@@ -27,14 +27,17 @@ pub fn log_user(entry: Vec<Log>, mut users: HashMap<String, User>, query: QType)
         users.insert(
             relation.get_username(),
             User {
-                username: relation.get_username(),
                 ip: {
-                    let ip = users.get(&relation.get_username());
-                    println!("ip {:?}", ip);
-                 //   match ip {
+                    let u = users.get(&relation.get_username());
+                    //println!("ip {:?}", ip);
+                    let ip = Some(u);
+                    match ip {
                  //       None => { let mut ip = Vec::new(); ip.push(relation.get_ip()); ip},
-                 //       Some(ip) => { ip.push(relation.get_ip()); ip },
-                  //  }
+                        Some(ip) => { //ip.push(relation.get_ip()); ip
+                        println!("T{:?}", ip);
+                        },
+                        None => (),
+                    }
                         Vec::new()
                 },
                 kind: { match query {
