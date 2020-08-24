@@ -14,6 +14,17 @@ impl Log {
     pub fn get_username(&self) -> String {
         String::from(self.username)
     }
+    
+    pub fn get_ip(&self) -> String {
+        String::from(self.ip)
+    }
+
+    pub fn get_dir(&self) -> String {
+        match self.dir {
+            Ok(f) => f,
+            Err(e) => String::from("empty"),
+        }
+    }
 }
 
 pub static DELETE: &str = "

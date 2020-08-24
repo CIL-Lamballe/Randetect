@@ -1,7 +1,7 @@
 //use std::fs::File;
 //use std::io;
-use std::collections::HashMap;
 use crate::query::Log;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 enum ActivityType {
@@ -24,10 +24,14 @@ static mut users: HashMap<String, User> = HashMap::new();
 
 pub fn log_user(entry: Vec<Log>) {
     for relation in entry {
-        users.insert(relation.get_username(), relation);
+        users.insert(relation.get_username(), User {
+            username: relation.get_username(),
+            ip: Vec[relation.get_ip()],
+            kind: Normal,
+        });
     }
     for guy in users.iter() {
-        println!("Calling {:?}", guy); 
+        println!("Calling {:?}", guy);
     }
 }
 
