@@ -3,39 +3,7 @@ use rusqlite::{params, Connection, Result};
 //const DB: &str = "/var/log/synolog/.SMBXFERDB";
 const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB"; // For dev
 
-#[derive(Debug)]
-pub struct Log {
-    username: String,
-    ip: String,
-    dir: Result<String>,
-}
-
-impl Log {
-    pub fn get_username(&self) -> String {
-        String::from(&self.username)
-    }
-
-    pub fn get_ip(&self) -> String {
-        String::from(&self.ip)
-    }
-
-    pub fn get_dir(&self) -> String {
-        match &self.dir {
-            Ok(f) => String::from(f),
-            Err(e) => String::from("empty"),
-        }
-    }
-}
-
-#[derive(Debug)]
-pub enum QType {
-    Delete,
-    SuspiciousCwd,
-    SuspiciousCrwd,
-    Move,
-}
-
-pub static DELETE: &str = "
+static DELETE: &str = "
     SELECT username, ip
     FROM   logs
     WHERE  id > ( SELECT MAX(id) - 2500
@@ -46,7 +14,7 @@ pub static DELETE: &str = "
             FROM logs ) - 100
         ;";
 
-pub static SUSPICIOUS_CWD: &str = "
+static SUSPICIOUS_CWD: &str = "
     SELECT D.username, D.ip
     FROM
     (
@@ -87,7 +55,7 @@ pub static SUSPICIOUS_CWD: &str = "
      AND D.filesize <= CWp.wrotefilesize
     ;";
 
-pub static SUSPICIOUS_CRWD: &str = "
+static SUSPICIOUS_CRWD: &str = "
      SELECT *
      FROM
      (
@@ -145,7 +113,7 @@ pub static SUSPICIOUS_CRWD: &str = "
          AND RDp.deletedfilesize > 0
          ;";
 
-pub static MOVE: &str = "
+static MOVE: &str = "
     SELECT username, ip, filename
     FROM logs
     WHERE id > ( SELECT MAX(id) - 2500
@@ -154,20 +122,68 @@ pub static MOVE: &str = "
         AND isdir = 1
     ;";
 
-pub fn select(stmt: &str) -> Vec<Log> {
+#[derive(Copy, Clone, Debug)]
+pub enum Type {
+    Delete,
+    SuspiciousCwd,
+    SuspiciousCrwd,
+    Move,
+}
+
+#[derive(Debug)]
+pub struct Log {
+    username: String,
+    ip: String,
+    dir: Result<String>,
+    kind: Type,
+}
+
+impl Log {
+    pub fn get_username(&self) -> String {
+        String::from(&self.username)
+    }
+
+    pub fn get_ip(&self) -> String {
+        String::from(&self.ip)
+    }
+
+    pub fn get_dir(&self) -> String {
+        match &self.dir {
+            Ok(f) => String::from(f),
+            Err(e) => String::from("empty"),
+        }
+    }
+}
+
+/// Retrieve SQL relations corresponding to given user action(qtype: MOVE | DELETE | SUSPICIOUS_CWD)
+pub fn select(qtype: Type) -> Vec<Log> {
+
     let conn = Connection::open(DB).unwrap();
-    let mut stmt = conn.prepare(stmt).unwrap();
+
+    let mut stmt = conn.prepare( match qtype {
+        Type::Delete => DELETE,
+        Type::SuspiciousCwd => SUSPICIOUS_CWD,
+        Type::SuspiciousCrwd => SUSPICIOUS_CRWD,
+        Type::Move => MOVE,
+    }
+        ).unwrap();
+
+  //  println!("query:{:?}", stmt);
+
     let logs = stmt
         .query_map(params![], |row| {
             Ok(Log {
                 username: row.get(0).unwrap(),
                 ip: row.get(1).unwrap(),
                 dir: row.get(2),
+                kind: qtype,
             })
         })
         .unwrap();
+
     let mut relation: Vec<Log> = Vec::new();
     for each in logs {
+   //     println!("here: {:?}", each);
         match each {
             Ok(t) => relation.push(t),
             Err(e) => (),
