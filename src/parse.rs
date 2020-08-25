@@ -19,21 +19,13 @@ pub struct UserInfo {
 //    ip: Vec<String>,
 //    kind: ActivityType,
     //  kind: Vec<ActivityType>,
+  //  count: i32,
 }
 
 /// Accounting of action in order to determine user behavior(Normal, Suspicious, Misbehaving)
 pub fn log(
     entry: Vec<Log>,
-    mut users: HashMap<String, UserInfo>
-) -> HashMap<String, UserInfo> {
+    users: &mut HashMap<String, UserInfo>
+) {
 
-    for relation in entry {
-        users.insert(
-            relation.get_username(),
-            UserInfo {
-                ip: relation.get_ip(),
-            },
-        );
-    }
-    users
 }
