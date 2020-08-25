@@ -1,7 +1,6 @@
 //use std::fs::File;
 //use std::io;
 use crate::query::Log;
-use crate::query::QType;
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -15,41 +14,50 @@ pub enum ActivityType {
 pub struct User {
     ip: Vec<String>,
     kind: ActivityType,
-  //  kind: Vec<ActivityType>,
+    //  kind: Vec<ActivityType>,
 }
 
 /* Maximum suspicious action limit */
 pub const BAN_LIMIT: u16 = 50;
 
-pub fn log_user(entry: Vec<Log>, mut users: HashMap<String, User>, query: QType) -> HashMap<String, User> {
-    for relation in entry {
-        users.insert(
-            relation.get_username(),
-            User {
-                ip: {
-                    let u = users.get(&relation.get_username());
-                    println!("ip {:?}", u);
-                    println!("pi {:?}", relation);
-                   // println!("ip {:?}", ip);
-                  //  match u {
-                   //     Some(u) => v.push(u.ip), //println!("ip {:?}", u),
-                    //    None => { let v = Vec::new(); v.push(u.ip); v },
-                   // }
-                        Vec::new()
-                },
-                kind: { match query {
-                    QType::Move => ActivityType::Misbehaving(String::from("DIRNAME")),
-                    QType::Delete | QType::SuspiciousCwd => ActivityType::Suspicious(42),
-                    _ => ActivityType::Normal,
-                } 
-                   // if !map.get(&relation.kind) let mut k = Vec::new();
-                   // v.push()
-                 },
-                },
-            );
-       }
-    users
-}
+//pub fn log_user(
+//    entry: Vec<Log>,
+//    mut users: HashMap<String, User>,
+//    query: QType,
+//) -> HashMap<String, User> {
+//    for relation in entry {
+//        users.insert(
+//            relation.get_username(),
+//            User {
+//                ip: {
+//                    let u = users.get(&relation.get_username());
+//                    println!("ip {:?}", u);
+//                    // println!("pi {:?}", relation);
+//                    // println!("ip {:?}", ip);
+//                   // match u {
+//                    //    Some(u) => v.push(relation.get_ip()), //println!("ip {:?}", u),
+//                     //   None => {
+//                      //      let v = Vec::new();
+//                       //     v.push(relation.get_ip());
+//                        //    v
+//                       // }
+//                    }
+//                    //     Vec::new()
+//                },
+//                kind: {
+//                    match query {
+//                        QType::Move => ActivityType::Misbehaving(String::from("DIRNAME")),
+//                        QType::Delete | QType::SuspiciousCwd => ActivityType::Suspicious(42),
+//                        _ => ActivityType::Normal,
+//                    }
+//                    // if !map.get(&relation.kind) let mut k = Vec::new();
+//                    // v.push()
+//                },
+//            },
+//            );
+//    }
+//    users
+//}
 
 pub mod sms {
     pub fn send() {}
