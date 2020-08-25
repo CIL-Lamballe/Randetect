@@ -153,6 +153,10 @@ impl Log {
             Err(e) => String::from("empty"),
         }
     }
+
+    pub fn get_kind(&self) -> Type {
+        self.kind
+    }
 }
 
 /// Retrieve SQL relations corresponding to given user action(qtype: MOVE | DELETE | SUSPICIOUS_CWD)
