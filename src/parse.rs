@@ -22,22 +22,30 @@ pub struct UserInfo {
     count: i32,
 }
 
+impl UserInfo {
+   fn increment(&mut self) {
+    self.count += 1;
+   }
+}
+
 /// Accounting of action in order to determine user behavior(Normal, Suspicious, Misbehaving)
 pub fn log(
     entry: Vec<Log>,
     users: &mut HashMap<String, UserInfo>
 ) {
     for el in entry {
-        if !users.contains_key("username") {
+        let uname = el.get_username();
+        if !users.contains_key(&uname) {
             users.insert(
-                el.get_username(),
+                uname,
                 UserInfo {
                     ip: el.get_ip(),
                     count: 0,
                 }
             );
         } else {
-            println!("exist {:?}", users);
+            users.get_mut(&uname).unwrap().increment();
+           // println!("exist {:?}", users);
         }
     }
 }
