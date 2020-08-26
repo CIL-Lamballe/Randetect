@@ -11,7 +11,6 @@ const BAN_LIMIT: u16 = 50;
 enum Behavior {
     Suspicious(i32),     // Containing nb of files manipulated.
     Misbehaving(String), // Contaning name of directory been moved.
-    Normal,              // Normal user activity.
 }
 
 #[derive(Debug)]
@@ -31,9 +30,9 @@ impl UserInfo {
             kind: {
                 let mut k = Vec::new();
                 k.push(match t {
-                    Type::Delete => Behavior::Suspicious(0),
-                    Type::SuspiciousCwd => Behavior::Suspicious(0),
-                    Type::SuspiciousCrwd => Behavior::Suspicious(0),
+                    Type::Delete => Behavior::Suspicious(1),
+                    Type::SuspiciousCwd => Behavior::Suspicious(1),
+                    Type::SuspiciousCrwd => Behavior::Suspicious(1),
                     Type::Move => Behavior::Misbehaving(dir),
                 });
                 k
@@ -42,11 +41,17 @@ impl UserInfo {
     }
 
     fn update(&mut self, newip: String, t: Type, dir: String) {
-        for each in &mut self.kind {
-            match each {
-                Behavior::Suspicious(c) => *c = *c + 1,
-                _ => (),
-            };
+        match t {
+            Type::Delete | Type::SuspiciousCwd | Type::SuspiciousCrwd => {
+                for each in &mut self.kind {
+                    match each {
+                        Behavior::Suspicious(c) => *c = *c + 1,
+                        _ => (),
+                    };
+                }
+            }
+            Type::Move => self.kind.push(Behavior::Misbehaving(dir)),
+            _ => (),
         }
         if !self.ip.contains(&newip) {
             self.ip.push(newip);
