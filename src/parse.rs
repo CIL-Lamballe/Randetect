@@ -1,6 +1,7 @@
 //use std::fs::File;
 //use std::io;
 use crate::query::Log;
+use crate::query::Type;
 use std::collections::HashMap;
 
 /// Maximum of suspicious actions
@@ -21,14 +22,21 @@ pub struct UserInfo {
 }
 
 impl UserInfo {
-    fn new(ip: String) -> UserInfo {
+    fn new(ip: String, t: Type, dir: String) -> UserInfo {
         UserInfo {
             ip: {
                 let mut n = Vec::new();
                 n.push(ip);
                 n
             },
-            kind: Behavior::Suspicious(0),
+            kind: {
+                match t {
+                    Type::Delete => Behavior::Suspicious(0),
+                    Type::SuspiciousCwd => Behavior::Suspicious(0),
+                    Type::SuspiciousCrwd => Behavior::Suspicious(0),
+                    Type::Move => Behavior::Misbehaving(dir),
+                }
+            },
         }
     }
 
@@ -48,7 +56,7 @@ pub fn log(entry: Vec<Log>, users: &mut HashMap<String, UserInfo>) {
     for el in entry {
         let uname = el.get_username();
         if !users.contains_key(&uname) {
-            users.insert(uname, UserInfo::new(el.get_ip()));
+            users.insert(uname, UserInfo::new(el.get_ip(), el.get_kind(), el.get_dir()));
         } else {
             users.get_mut(&uname).unwrap().update(el.get_ip());
         }
