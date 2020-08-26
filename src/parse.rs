@@ -42,6 +42,12 @@ impl UserInfo {
     }
 
     fn update(&mut self, newip: String, t: Type, dir: String) {
+        for each in &self.kind {
+          //  match each {
+                
+          //  }
+            println!("here{:?}", each);
+        }
         if !self.ip.contains(&newip) {
             self.ip.push(newip);
         }
