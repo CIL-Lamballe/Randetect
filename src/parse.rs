@@ -16,9 +16,8 @@ enum Behavior {
 #[derive(Debug)]
 pub struct UserInfo {
     ip: Vec<String>,
-    //    kind: ActivityType,
+    kind: Behavior,
     //  kind: Vec<ActivityType>,
-    count: i32,
 }
 
 impl UserInfo {
@@ -29,12 +28,15 @@ impl UserInfo {
                 n.push(ip);
                 n
             },
-            count: 0,
+            kind: Behavior::Suspicious(0),
         }
     }
 
     fn update(&mut self, newip: String) {
-        self.count += 1;
+        match self.kind {
+            Behavior::Suspicious(c) => self.kind = Behavior::Suspicious(c + 1),
+            _ => self.kind = Behavior::Suspicious(21),
+            }
         if !self.ip.contains(&newip) {
             self.ip.push(newip);
         }
