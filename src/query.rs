@@ -161,18 +161,18 @@ impl Log {
 
 /// Retrieve SQL relations corresponding to given user action(qtype: MOVE | DELETE | SUSPICIOUS_CWD)
 pub fn select(qtype: Type) -> Vec<Log> {
-
     let conn = Connection::open(DB).unwrap();
 
-    let mut stmt = conn.prepare( match qtype {
-        Type::Delete => DELETE,
-        Type::SuspiciousCwd => SUSPICIOUS_CWD,
-        Type::SuspiciousCrwd => SUSPICIOUS_CRWD,
-        Type::Move => MOVE,
-    }
-        ).unwrap();
+    let mut stmt = conn
+        .prepare(match qtype {
+            Type::Delete => DELETE,
+            Type::SuspiciousCwd => SUSPICIOUS_CWD,
+            Type::SuspiciousCrwd => SUSPICIOUS_CRWD,
+            Type::Move => MOVE,
+        })
+        .unwrap();
 
-  //  println!("query:{:?}", stmt);
+    //  println!("query:{:?}", stmt);
 
     let logs = stmt
         .query_map(params![], |row| {
@@ -187,7 +187,7 @@ pub fn select(qtype: Type) -> Vec<Log> {
 
     let mut relation: Vec<Log> = Vec::new();
     for each in logs {
-   //     println!("here: {:?}", each);
+        //     println!("here: {:?}", each);
         match each {
             Ok(t) => relation.push(t),
             Err(e) => (),

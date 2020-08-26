@@ -1,15 +1,14 @@
-use std::{thread, time};
 use std::collections::HashMap;
+use std::{thread, time};
 
-mod query;
-mod parse;
 mod alert;
+mod parse;
+mod query;
 
 /// Loop delay in milliseconds
 const TIME: u64 = 2_000;
 
 fn main() {
-
     let duration = time::Duration::from_millis(TIME);
 
     let mut list: HashMap<String, parse::UserInfo> = HashMap::new();
@@ -24,6 +23,6 @@ fn main() {
         println!("List= {:?}", user);
     }
 
-   // thread::sleep(duration);
+    // thread::sleep(duration);
     //    }
 }
