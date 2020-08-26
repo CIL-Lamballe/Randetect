@@ -15,8 +15,8 @@ enum Behavior {
 
 #[derive(Debug)]
 pub struct UserInfo {
-    ip: String,
-    //    ip: Vec<String>,
+    //ip: String,
+    ip: Vec<String>,
     //    kind: ActivityType,
     //  kind: Vec<ActivityType>,
     count: i32,
@@ -25,6 +25,12 @@ pub struct UserInfo {
 impl UserInfo {
    fn increment(&mut self) {
     self.count += 1;
+   }
+
+   fn push_ip(&mut self, new: String) {
+        if !self.ip.contains(&new) {
+            self.ip.push(new);
+        }
    }
 }
 
@@ -39,13 +45,14 @@ pub fn log(
             users.insert(
                 uname,
                 UserInfo {
-                    ip: el.get_ip(),
+                    ip: { let mut n = Vec::new(); n.push(el.get_ip()); n },
                     count: 0,
                 }
             );
         } else {
             users.get_mut(&uname).unwrap().increment();
-           // println!("exist {:?}", users);
+            let new_ip = el.get_ip();
+            users.get_mut(&uname).unwrap().push_ip(new_ip);
         }
     }
 }
