@@ -42,11 +42,11 @@ impl UserInfo {
     }
 
     fn update(&mut self, newip: String, t: Type, dir: String) {
-        for each in &self.kind {
-          //  match each {
-                
-          //  }
-            println!("here{:?}", each);
+        for each in &mut self.kind {
+            match each {
+                Behavior::Suspicious(c) => *c = *c + 1,
+                _ => (),
+            };
         }
         if !self.ip.contains(&newip) {
             self.ip.push(newip);
