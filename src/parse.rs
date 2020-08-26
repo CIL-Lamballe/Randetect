@@ -28,7 +28,8 @@ impl UserInfo {
                 n.push(ip);
                 n
             },
-            kind: { let mut k = Vec::new();
+            kind: {
+                let mut k = Vec::new();
                 k.push(match t {
                     Type::Delete => Behavior::Suspicious(0),
                     Type::SuspiciousCwd => Behavior::Suspicious(0),
@@ -40,12 +41,7 @@ impl UserInfo {
         }
     }
 
-    fn update(&mut self, newip: String) {
- //       match self.kind {
-   //         Behavior::Suspicious(c) => self.kind = Behavior::Suspicious(c + 1),
-     //       Behavior::Suspicious(c) => self.kind = Behavior::Suspicious(c + 1),
-       //     _ => (),
-         //   }
+    fn update(&mut self, newip: String, t: Type, dir: String) {
         if !self.ip.contains(&newip) {
             self.ip.push(newip);
         }
@@ -59,10 +55,13 @@ pub fn log(entry: Vec<Log>, users: &mut HashMap<String, UserInfo>) {
         if !users.contains_key(&uname) {
             users.insert(
                 uname,
-                UserInfo::new(el.get_ip(), el.get_kind(), el.get_dir())
-                );
+                UserInfo::new(el.get_ip(), el.get_kind(), el.get_dir()),
+            );
         } else {
-            users.get_mut(&uname).unwrap().update(el.get_ip());
+            users
+                .get_mut(&uname)
+                .unwrap()
+                .update(el.get_ip(), el.get_kind(), el.get_dir());
         }
     }
 }
