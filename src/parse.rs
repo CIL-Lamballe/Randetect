@@ -43,7 +43,7 @@ impl UserInfo {
     fn update(&mut self, newip: String) {
         match self.kind {
             Behavior::Suspicious(c) => self.kind = Behavior::Suspicious(c + 1),
-            _ => self.kind = Behavior::Suspicious(21),
+            _ => (),
             }
         if !self.ip.contains(&newip) {
             self.ip.push(newip);
@@ -56,7 +56,10 @@ pub fn log(entry: Vec<Log>, users: &mut HashMap<String, UserInfo>) {
     for el in entry {
         let uname = el.get_username();
         if !users.contains_key(&uname) {
-            users.insert(uname, UserInfo::new(el.get_ip(), el.get_kind(), el.get_dir()));
+            users.insert(
+                uname,
+                UserInfo::new(el.get_ip(), el.get_kind(), el.get_dir())
+                );
         } else {
             users.get_mut(&uname).unwrap().update(el.get_ip());
         }
