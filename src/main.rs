@@ -33,9 +33,9 @@ fn main() {
                     println!("BAN of {} for having suspicious activity", name)
                 }
                 parse::Behavior::Move(s) => {
-                        println!("{} moved the folder {}", name, *s);
-                        alert::email::send(&name, info, "Move")
-                },
+                    println!("{} moved the folder {}", name, *s);
+                    alert::email::send(&name, info, "Move")
+                }
                 _ => (),
             }
         }
