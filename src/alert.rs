@@ -5,38 +5,12 @@ pub mod sms {
 }
 
 pub mod email {
-    use std::error::Error;
-    use std::fs::File;
-    use std::io::prelude::*;
-    use std::path::Path;
-    use std::process::Command;
-
-    fn create(subject: &str, text: &str) {
-        let mail = format!("Subject: {}\n{}\n", subject, text);
-        //println!("{}", mail);
-
-        let path = Path::new("email.txt");
-        let mut file = match std::fs::File::create(&path) {
-            Err(why) => panic!("Failed to create email: {}", Error::description(&why)),
-            Ok(file) => file,
-        };
-        match file.write_all(mail.as_bytes()) {
-            Err(why) => panic!("Could not write to email.txt: {}", Error::description(&why)),
-            Ok(_) => (),
-        }
-    }
-
     pub fn send() {
         let to = "a.barthleemy@cil-lamballe.com";
 
-     //   create(
-      //      "Suspicious user",
-       //     "A user have been using it badly it has been banned",
-      //  );
-
         let ssmtp = "ssmtp ".to_string() + to + &format!(" <<< \"{}\"", format!("Subject: {}\n{}\n", "Suspicious user", "A user have been using it badly it has been banned"));
         println!("{}", ssmtp);
-        let output = Command::new("bash")
+        let output = std::process::Command::new("bash")
             .arg("-c")
             .arg(ssmtp)
             .output()
