@@ -41,8 +41,6 @@ fn main() {
         }
         // println!("{:?}",user.UserInfo);
     }
-    //alert::email::send();
-
     // thread::sleep(duration);
     //    }
 }
