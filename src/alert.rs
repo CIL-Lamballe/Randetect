@@ -29,22 +29,22 @@ pub mod email {
     pub fn send() {
         let to = "a.barthleemy@cil-lamballe.com";
 
-        create(
-            "Suspicious user",
-            "A user have been using it badly it has been banned",
-        );
+     //   create(
+      //      "Suspicious user",
+       //     "A user have been using it badly it has been banned",
+      //  );
 
-        let ssmtp = "ssmtp ".to_string() + to + " < email.txt";
-
-        let output = Command::new("sh")
+        let ssmtp = "ssmtp ".to_string() + to + &format!(" <<< \"{}\"", format!("Subject: {}\n{}\n", "Suspicious user", "A user have been using it badly it has been banned"));
+        println!("{}", ssmtp);
+        let output = Command::new("bash")
             .arg("-c")
             .arg(ssmtp)
             .output()
             .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
 
         // Debug
-        //  println!("status: {}", output.status);
-        //  println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-        //  println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+          println!("status: {}", output.status);
+          println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+          println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
     }
 }
