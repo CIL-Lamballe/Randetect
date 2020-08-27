@@ -22,11 +22,17 @@ fn main() {
     for user in list.iter() {
         let (name, info) = user;
         //println!("List= {:?}", user);
-        println!("List= {:?}", info.get_behaviors());
+        //println!("List= {:?}", info.get_behaviors());
         for beh in info.get_behaviors() {
             match beh {
-                parse::Behavior::Suspicious(c) if *c >= 50 => println!("BAN {}", name),
-                parse::Behavior::Misbehaving(s) => println!("{} moved the folder {}", name, *s),
+                parse::Behavior::Delete(c) if *c >= 50 => println!(
+                    "BAN of {} because he/she as been deleting {} files",
+                    name, *c
+                ),
+                parse::Behavior::Suspicious(c) if *c >= 50 => {
+                    println!("BAN of {} for having suspicious activity", name)
+                }
+                parse::Behavior::Move(s) => println!("{} moved the folder {}", name, *s),
                 _ => (),
             }
         }
