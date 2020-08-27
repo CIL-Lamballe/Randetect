@@ -32,13 +32,16 @@ fn main() {
                 parse::Behavior::Suspicious(c) if *c >= 50 => {
                     println!("BAN of {} for having suspicious activity", name)
                 }
-                parse::Behavior::Move(s) => println!("{} moved the folder {}", name, *s),
+                parse::Behavior::Move(s) => {
+                        println!("{} moved the folder {}", name, *s);
+                        alert::email::send(&name, info, "Move")
+                },
                 _ => (),
             }
         }
         // println!("{:?}",user.UserInfo);
     }
-    alert::email::send();
+    //alert::email::send();
 
     // thread::sleep(duration);
     //    }
