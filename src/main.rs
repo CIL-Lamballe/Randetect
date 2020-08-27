@@ -38,7 +38,7 @@ fn main() {
         }
         // println!("{:?}",user.UserInfo);
     }
-    alert::email::send("a.barthleemy@cil-lamballe.com", "Hello buddy");
+    alert::email::send();
 
     // thread::sleep(duration);
     //    }
