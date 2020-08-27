@@ -15,7 +15,8 @@ pub mod email {
                 " <<< \"{}\"",
                 format!(
                     "Subject: {}\n{}\n",
-                    format!("{} - {}", user, act), format!("{} performed {}\nDetail:\n{:?}", user, act, info)
+                    format!("{} - {}", user, act),
+                    format!("{} performed {}\nDetail:\n{:?}", user, act, info)
                 )
             );
 
@@ -28,8 +29,8 @@ pub mod email {
             .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
 
         // Debug
-//        println!("status: {}", output.status);
-//        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-//        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+        //        println!("status: {}", output.status);
+        //        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        //        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
     }
 }
