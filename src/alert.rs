@@ -1,4 +1,4 @@
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 pub mod sms {
     pub fn send() {}
@@ -6,11 +6,7 @@ pub mod sms {
 
 pub mod email {
 
-    pub fn send() {
-            let output = std::process::Command::new("touch")
-                     .arg("Hello")
-                     .output()
-                     .expect("Failed to execute command");
-           // println!("{:?}", output);
+    pub fn send(email: &str, msg: &str) {
+        //println!("{} {}", email, msg);
     }
 }
