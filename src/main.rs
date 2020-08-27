@@ -20,7 +20,17 @@ fn main() {
 
     parse::log(query, &mut list);
     for user in list.iter() {
-        println!("List= {:?}", user);
+        let (name, info) = user;
+        //println!("List= {:?}", user);
+        println!("List= {:?}", info.get_behaviors());
+        for beh in info.get_behaviors() {
+            match beh {
+                parse::Behavior::Suspicious(c) if *c >= 50 => println!("BAN {}", name),
+                parse::Behavior::Misbehaving(s) => println!("{} moved the folder {}", name, *s),
+                _ => (),
+            }
+        }
+        // println!("{:?}",user.UserInfo);
     }
 
     // thread::sleep(duration);

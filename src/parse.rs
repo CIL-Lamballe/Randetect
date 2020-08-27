@@ -8,7 +8,7 @@ use std::collections::HashMap;
 const BAN_LIMIT: u16 = 50;
 
 #[derive(Debug)]
-enum Behavior {
+pub enum Behavior {
     Suspicious(i32),     // Containing nb of files manipulated.
     Misbehaving(String), // Contaning name of directory been moved.
 }
@@ -56,6 +56,10 @@ impl UserInfo {
         if !self.ip.contains(&newip) {
             self.ip.push(newip);
         }
+    }
+
+    pub fn get_behaviors(&self) -> &Vec<Behavior> {
+        &self.kind
     }
 }
 
