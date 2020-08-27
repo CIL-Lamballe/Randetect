@@ -1,7 +1,9 @@
-use std::process::{Command, Stdio};
-
 pub mod sms {
-    pub fn send() {}
+    pub fn send(user: &str, info: &crate::parse::UserInfo, act: &str) {
+        let now = format!("{:?}", std::time::SystemTime::now());
+        let now = format!("{}{}", &now[21..31], &now[42..51]);
+        println!("{}", now);
+    }
 }
 
 pub mod email {

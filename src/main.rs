@@ -21,8 +21,6 @@ fn main() {
     parse::log(query, &mut list);
     for user in list.iter() {
         let (name, info) = user;
-        //println!("List= {:?}", user);
-        //println!("List= {:?}", info.get_behaviors());
         for beh in info.get_behaviors() {
             match beh {
                 parse::Behavior::Delete(c) if *c >= 50 => println!(
@@ -30,7 +28,8 @@ fn main() {
                     name, *c
                 ),
                 parse::Behavior::Suspicious(c) if *c >= 50 => {
-                    println!("BAN of {} for having suspicious activity", name)
+                    println!("BAN of {} for having suspicious activity", name);
+                    alert::sms::send(&name, info, "Suspicious")
                 }
                 parse::Behavior::Move(s) => {
                     println!("{} moved the folder {}", name, *s);
