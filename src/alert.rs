@@ -1,11 +1,16 @@
+use std::process::Command;
+
 pub mod sms {
     pub fn send() {}
 }
 
 pub mod email {
 
-    pub fn send() -> Result<std::fs::File, std::io::Error> {
-        let f = std::fs::File::open("email.txt")?;
-        Ok(f)
+    pub fn send() {
+            let output = std::process::Command::new("touch")
+                     .arg("Hello")
+                     .output()
+                     .expect("Failed to execute command");
+           // println!("{:?}", output);
     }
 }
