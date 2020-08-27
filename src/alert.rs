@@ -5,10 +5,9 @@ pub mod sms {
 }
 
 pub mod email {
-    use crate::parse;
     const to: &str = "a.barthleemy@cil-lamballe.com";
 
-    pub fn send(user: &str, info: &parse::UserInfo, act: &str) {
+    pub fn send(user: &str, info: &crate::parse::UserInfo, act: &str) {
         let ssmtp = "ssmtp ".to_string()
             + to
             + &format!(
