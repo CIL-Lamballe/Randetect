@@ -39,6 +39,8 @@ fn main() {
 
     let var: Cdtl = env_variables();
 
+
+/*
     let duration = time::Duration::from_millis(TIME);
 
     let mut list: HashMap<String, parse::UserInfo> = HashMap::new();
@@ -72,4 +74,5 @@ fn main() {
     }
     // thread::sleep(duration);
     //    }
+*/
 }
