@@ -38,16 +38,16 @@ pub mod sms {
     pub fn send(cdtl: &Cdtl) {
         let (arg, fname) = prepare(cdtl);
         println!("\narg:{}\n{}\n", arg, fname);
-        //   let output = std::process::Command::new("bash")
-        //       .arg("-c")
-        //       .arg(arg)
-        //       .output()
-        //       .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
+        let output = std::process::Command::new("bash")
+            .arg("-c")
+            .arg(arg)
+            .output()
+            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
 
         // Debug
-        //        println!("status: {}", output.status);
-        //        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-        //        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+        println!("status: {}", output.status);
+        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
         std::fs::remove_file(fname);
     }
 }
