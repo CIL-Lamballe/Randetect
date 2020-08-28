@@ -3,16 +3,22 @@ use rusqlite::{NO_PARAMS, params, Connection, Result};
 //const DB: &str = "/var/log/synolog/.SMBXFERDB";
 //const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB"; // For dev
 
-static DELETE: &str = "
-    SELECT username, ip
-    FROM   logs
-    WHERE  id > ( SELECT MAX(id) - 2500
-                  FROM logs
-                  WHERE isdir = 0 )
+pub fn fmt_qdelete(id: i32, period: i32) -> String {
+    // period 100
+    // id 2500
+    format!(
+            "SELECT username, ip
+             FROM   logs
+             WHERE  id > (  SELECT MAX(id) - {}
+                            FROM logs
+                            WHERE isdir = 0 )
            AND cmd = 'delete'
            AND time > ( SELECT MAX(time)
-            FROM logs ) - 100
-        ;";
+            FROM logs ) - {}
+        ;", id, period
+
+    )
+}
 
 static SUSPICIOUS_CWD: &str = "
     SELECT D.username, D.ip
@@ -118,14 +124,14 @@ static SUSPICIOUS_CRWD: &str = "
          AND RDp.deletedfilesize > 0
          ;";
 
-static MOVE: &str = "
-    SELECT username, ip, filename
-    FROM logs
-    WHERE id > ( SELECT MAX(id) - 2500
-            FROM logs )
-        AND cmd = 'move'
-        AND isdir = 1
-    ;";
+pub fn fmt_qmove(id: i32) -> String {
+    format!("SELECT username, ip, filename
+             FROM logs
+             WHERE id > ( SELECT MAX(id) - {}
+                          FROM logs )
+             AND cmd = 'move'
+             AND isdir = 1;", id)
+}
 
 
 #[derive(Debug)]
@@ -196,14 +202,14 @@ impl Log {
 pub fn select(conn: &Connection, qtype: Type) -> Vec<Log> {
     get_currentid(conn);
 
-    let mut stmt = conn
-        .prepare(match qtype {
-            Type::Delete => DELETE,
-            Type::SuspiciousCwd => SUSPICIOUS_CWD,
-            Type::SuspiciousCrwd => SUSPICIOUS_CRWD,
-            Type::Move => MOVE,
-        })
-        .unwrap();
+    let mut stmt = {
+        match qtype {
+            Type::Delete => conn.prepare(&fmt_qdelete(2_500, 100)).unwrap(),
+            Type::SuspiciousCwd => conn.prepare(&fmt_qdelete(2_500, 100)).unwrap(),
+            Type::SuspiciousCrwd => conn.prepare(&fmt_qdelete(2_500, 100)).unwrap(),
+            Type::Move => conn.prepare(&fmt_qmove(2_500)).unwrap(),
+        }
+    };
 
     //  println!("query:{:?}", stmt);
 
@@ -220,7 +226,7 @@ pub fn select(conn: &Connection, qtype: Type) -> Vec<Log> {
 
     let mut relation: Vec<Log> = Vec::new();
     for each in logs {
-        //     println!("here: {:?}", each);
+       //      println!("here: {:?}", each);
         match each {
             Ok(t) => relation.push(t),
             Err(e) => (),
