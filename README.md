@@ -29,3 +29,21 @@ xmin: Time between a create and a write operation on a same file.
 <img src="https://latex.codecogs.com/gif.latex?\small&space;\prod_{ip,&space;username}\sigma_{C.cmd\,=\,'read'&space;\;\cap\;&space;D.cmd\,=\,'delete'&space;\;\cap\;&space;C.filename\,=\,D.filename&space;\;\cap\;&space;0\,\geq\,&space;D.time-C.time\,\leq\,&space;y,\:&space;y\,&space;\neq\,&space;0&space;}&space;\left&space;(&space;\rho_{C}&space;\left&space;(logs&space;\right&space;)&space;\times&space;\rho_{D}\left&space;(&space;logs&space;\right&space;)&space;\right&space;)" title="\small \prod_{ip, username}\sigma_{C.cmd\,=\,'read' \;\cap\; D.cmd\,=\,'delete' \;\cap\; C.filename\,=\,D.filename \;\cap\; 0\,\geq\, D.time-C.time\,\leq\, y,\: y\, \neq\, 0 } \left ( \rho_{C} \left (logs \right ) \times \rho_{D}\left ( logs \right ) \right )" />
 
 Encrypting does not inherently make a file larger but most of the time it does, for this reason we randomly checksum the files been raised by the alert.
+
+## Run
+
+In order to run the program, some env variables needs to be set.
+
+`CRDTL=ABCDEFGHIJ01234567` where the 10 first bytes are the sms system username and the 8 last bytes are the password.
+
+`TARGETSYS=62.186.103.42` ip or domain of the targeted machine.
+
+`FOLDER=/var/log/sms` target folder to send sms file to.
+
+`SMSUSR=SMS-TOTO` username for modem.
+
+Example:
+
+```shell=
+CRDTL=ABCDEFGHIJ01234567 TARGETSYS=62.186.103.42 FOLDER=/var/log/sms SMSUSR=SMS-TOTO ./randetect
+```
