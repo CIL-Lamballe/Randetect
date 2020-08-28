@@ -3,9 +3,11 @@ pub mod sms {
     use std::fs::File;
     use std::io::Write;
 
-    fn file(timestamp: &str, core: &str) {
-        let mut file = File::create(format!("{}_sms.txt", timestamp)).unwrap();
+    fn file(timestamp: &str, core: &str) -> String {
+        let fname = format!("{}_sms.txt", timestamp);
+        let mut file = File::create(&fname).unwrap();
         file.write(core.as_bytes()).unwrap();
+        fname
     }
 
     fn timestamp() -> String {
@@ -15,12 +17,12 @@ pub mod sms {
         now
     }
 
-    pub fn send(cdtl: &Cdtl) {
+    fn prepare(cdtl: &Cdtl) -> (String, String) {
         let tstamp = timestamp();
         let text = format!("{};TEST Alert NAS new prg\n", cdtl.get_smsusr());
-        println!("{}", text);
+        //    println!("{}", text);
 
-        file(&tstamp, &text);
+        let fname = file(&tstamp, &text);
 
         let arg = format!(
             "open -u {},{} {}; put -O {} {}_sms.txt",
@@ -30,7 +32,23 @@ pub mod sms {
             cdtl.get_folder(),
             tstamp
         );
-        println!("\narg:{}\n", arg);
+        (format!("lftp -c \"{}\"", arg), fname)
+    }
+
+    pub fn send(cdtl: &Cdtl) {
+        let (arg, fname) = prepare(cdtl);
+        println!("\narg:{}\n{}\n", arg, fname);
+        //   let output = std::process::Command::new("bash")
+        //       .arg("-c")
+        //       .arg(arg)
+        //       .output()
+        //       .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
+
+        // Debug
+        //        println!("status: {}", output.status);
+        //        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        //        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+        std::fs::remove_file(fname);
     }
 }
 
