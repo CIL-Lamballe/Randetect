@@ -20,10 +20,12 @@ pub fn fmt_qdelete(id: i32, period: i32) -> String {
     )
 }
 
-static SUSPICIOUS_CWD: &str = "
-    SELECT D.username, D.ip
-    FROM
-    (
+pub fn fmt_qsuspiciouscwd(id: i32, period: i32) -> String {
+    //id 2_500
+    //period 3
+    format!("SELECT D.username, D.ip
+             FROM
+            (
      SELECT    A.ip, A.username, A.filename,
      B.filesize as wrotefilesize, A.cmd,
      A.time as createtime, B.cmd,
@@ -33,7 +35,7 @@ static SUSPICIOUS_CWD: &str = "
       SELECT    *
       FROM    logs
       WHERE    id > (
-          SELECT MAX(id) - 1000
+          SELECT MAX(id) - {}
           FROM    logs
           WHERE    isdir = 0
           )
@@ -42,7 +44,7 @@ static SUSPICIOUS_CWD: &str = "
       SELECT    *
       FROM    logs
       WHERE    id > (
-          SELECT    MAX(id) - 1000
+          SELECT    MAX(id) - {}
           FROM    logs
           WHERE    isdir = 0
           )
@@ -56,15 +58,16 @@ static SUSPICIOUS_CWD: &str = "
       FROM    logs
       WHERE    isdir = 0 AND cmd = 'delete'
                 AND id > (
-                        SELECT    MAX(id) - 1000
+                        SELECT    MAX(id) - {}
                         FROM    logs
                         WHERE    isdir = 0
                     )
      ) D
      WHERE    CWp.writetime <= D.time
-     AND (D.time - CWp.writetime) <= 3
+     AND (D.time - CWp.writetime) <= {}
      AND D.filesize <= CWp.wrotefilesize
-    ;";
+    ;", id, id, id, period)
+}
 
 static SUSPICIOUS_CRWD: &str = "
      SELECT *
@@ -198,14 +201,15 @@ impl Log {
     }
 }
 
-/// Retrieve SQL relations corresponding to given user action(qtype: MOVE | DELETE | SUSPICIOUS_CWD)
+/// Retrieve SQL relations corresponding to given user action(qtype: Move | Delete | SuspiciousCwd
+/// | SuspiciousCrwd)
 pub fn select(conn: &Connection, qtype: Type) -> Vec<Log> {
     get_currentid(conn);
 
     let mut stmt = {
         match qtype {
             Type::Delete => conn.prepare(&fmt_qdelete(2_500, 100)).unwrap(),
-            Type::SuspiciousCwd => conn.prepare(&fmt_qdelete(2_500, 100)).unwrap(),
+            Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(2_500, 3)).unwrap(),
             Type::SuspiciousCrwd => conn.prepare(&fmt_qdelete(2_500, 100)).unwrap(),
             Type::Move => conn.prepare(&fmt_qmove(2_500)).unwrap(),
         }
