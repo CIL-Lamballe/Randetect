@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::{thread, time};
+use std::{thread, time, env};
 
 mod alert;
 mod parse;
@@ -10,8 +10,13 @@ const TIME: u64 = 2_000;
 
 fn main() {
 
-    // Open credentials file and then get each line to get user and password
-    
+    let key = "HOME";
+    match env::var(key) {
+    Ok(val) => println!("{}: {:?}", key, val),
+    Err(e) => println!("couldn't interpret {}: {}", key, e),
+    }
+
+
     let duration = time::Duration::from_millis(TIME);
 
     let mut list: HashMap<String, parse::UserInfo> = HashMap::new();
