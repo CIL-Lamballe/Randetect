@@ -5,12 +5,18 @@ mod alert;
 mod parse;
 mod query;
 
-struct Cdtl {
+pub struct Cdtl {
     user: String,
     pwd: String,
     sys: String,
     folder: String,
     smsusr: String,
+}
+
+impl Cdtl {
+    pub fn get_smsusr(&self) -> &str {
+        &self.smsusr
+    }
 }
 
 /// Loop delay in milliseconds
@@ -39,6 +45,7 @@ fn main() {
 
     let var: Cdtl = env_variables();
 
+    alert::sms::send(&var);
 
 /*
     let duration = time::Duration::from_millis(TIME);

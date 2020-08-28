@@ -1,8 +1,16 @@
 pub mod sms {
-    pub fn send(user: &str, info: &crate::parse::UserInfo, act: &str) {
+    use crate::Cdtl;
+
+    fn timestamp() -> String {
         let now = format!("{:?}", std::time::SystemTime::now());
         let now = format!("{}{}", &now[21..31], &now[42..51]);
         println!("{}", now);
+        now
+    }
+
+    pub fn send(cdtl: &Cdtl) {
+        let text = format!("{};TEST Alert NAS new prg", cdtl.get_smsusr());
+        println!("{}", text);
     }
 }
 
