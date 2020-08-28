@@ -1,9 +1,12 @@
 use std::collections::HashMap;
 use std::{env, thread, time};
+use rusqlite::Connection;
 
 mod alert;
 mod parse;
 mod query;
+
+const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB";
 
 pub struct Cdtl {
     user: String,
@@ -60,41 +63,39 @@ fn env_variables() -> Cdtl {
 fn main() {
     let var: Cdtl = env_variables();
 
-    alert::sms::send(&var);
+    let duration = time::Duration::from_millis(TIME);
 
-    /*
-        let duration = time::Duration::from_millis(TIME);
+    let conn = Connection::open(DB).unwrap();
 
-        let mut list: HashMap<String, parse::UserInfo> = HashMap::new();
+    let mut list: HashMap<String, parse::UserInfo> = HashMap::new();
 
-        //    loop {
-        let mut query = query::select(query::Type::Move);
-        query.extend(query::select(query::Type::Delete));
-        query.extend(query::select(query::Type::SuspiciousCwd));
+    //    loop {
+    let mut query = query::select(&conn, query::Type::Move);
+    query.extend(query::select(&conn, query::Type::Delete));
+    query.extend(query::select(&conn, query::Type::SuspiciousCwd));
 
-        parse::log(query, &mut list);
-        for user in list.iter() {
-            let (name, info) = user;
-            for beh in info.get_behaviors() {
-                match beh {
-                    parse::Behavior::Delete(c) if *c >= 50 => println!(
-                        "BAN of {} because he/she as been deleting {} files",
-                        name, *c
-                    ),
-                    parse::Behavior::Suspicious(c) if *c >= 50 => {
-                        println!("BAN of {} for having suspicious activity", name);
-                        alert::sms::send(&name, info, "Suspicious")
-                    }
-                    parse::Behavior::Move(s) => {
-                        println!("{} moved the folder {}", name, *s);
-                        alert::email::send(&name, info, "Move")
-                    }
-                    _ => (),
-                }
+    parse::log(query, &mut list);
+    for user in list.iter() {
+        let (name, info) = user;
+        for beh in info.get_behaviors() {
+            match beh {
+                parse::Behavior::Delete(c) if *c >= 50 => {
+                   // println!("BAN of {} because he/she as been deleting {} files", name, *c);
+                    alert::email::send(&name, info, "Move");
+                },
+                parse::Behavior::Suspicious(c) if *c >= 50 => {
+                  //  println!("BAN of {} for having suspicious activity", name);
+                    alert::sms::send(&var, &name, info);
+                },
+                parse::Behavior::Move(s) => {
+                  //  println!("{} moved the folder {}", name, *s);
+                    alert::email::send(&name, info, "Move");
+                },
+                _ => (),
             }
-            // println!("{:?}",user.UserInfo);
         }
-        // thread::sleep(duration);
-        //    }
-    */
+        // println!("{:?}",user.UserInfo);
+    }
+    // thread::sleep(duration);
+    //    }
 }

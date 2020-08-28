@@ -17,10 +17,10 @@ pub mod sms {
         now
     }
 
-    fn prepare(cdtl: &Cdtl) -> (String, String) {
+    fn prepare(cdtl: &Cdtl, uname: &str, info: &crate::parse::UserInfo) -> (String, String) {
         let tstamp = timestamp();
-        let text = format!("{};TEST Alert NAS new prg\n", cdtl.get_smsusr());
-        //    println!("{}", text);
+        let text = format!("{};TEST Alert NAS\n{}\n{:?}\n", cdtl.get_smsusr(), uname, info);
+        //println!("{}", text);
 
         let fname = file(&tstamp, &text);
 
@@ -35,19 +35,19 @@ pub mod sms {
         (format!("lftp -c \"{}\"", arg), fname)
     }
 
-    pub fn send(cdtl: &Cdtl) {
-        let (arg, fname) = prepare(cdtl);
-        println!("\narg:{}\n{}\n", arg, fname);
-        let output = std::process::Command::new("bash")
-            .arg("-c")
-            .arg(arg)
-            .output()
-            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
+    pub fn send(cdtl: &Cdtl, uname: &str, info: &crate::parse::UserInfo) {
+        let (arg, fname) = prepare(cdtl, uname, info);
+        //println!("\narg:{}\n{}\n", arg, fname);
+     //           let output = std::process::Command::new("bash")
+     //               .arg("-c")
+      //              .arg(arg)
+     //               .output()
+     //               .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
 
         // Debug
-        println!("status: {}", output.status);
-        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+        //        println!("status: {}", output.status);
+        //        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        //        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
         std::fs::remove_file(fname);
     }
 }
@@ -67,13 +67,13 @@ pub mod email {
                 )
             );
 
-        println!("{}", ssmtp);
+        //println!("{}", ssmtp);
 
-        let output = std::process::Command::new("bash")
-            .arg("-c")
-            .arg(ssmtp)
-            .output()
-            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
+       // let output = std::process::Command::new("bash")
+       //     .arg("-c")
+       //     .arg(ssmtp)
+       //     .output()
+       //     .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
 
         // Debug
         //        println!("status: {}", output.status);
