@@ -1,7 +1,7 @@
-use rusqlite::{params, Connection, Result};
+use rusqlite::{NO_PARAMS, params, Connection, Result};
 
 //const DB: &str = "/var/log/synolog/.SMBXFERDB";
-const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB"; // For dev
+//const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB"; // For dev
 
 static DELETE: &str = "
     SELECT username, ip
@@ -27,7 +27,7 @@ static SUSPICIOUS_CWD: &str = "
       SELECT    *
       FROM    logs
       WHERE    id > (
-          SELECT MAX(id) - 2500
+          SELECT MAX(id) - 1000
           FROM    logs
           WHERE    isdir = 0
           )
@@ -36,7 +36,7 @@ static SUSPICIOUS_CWD: &str = "
       SELECT    *
       FROM    logs
       WHERE    id > (
-          SELECT    MAX(id) - 2500
+          SELECT    MAX(id) - 1000
           FROM    logs
           WHERE    isdir = 0
           )
@@ -49,6 +49,11 @@ static SUSPICIOUS_CWD: &str = "
       SELECT    *
       FROM    logs
       WHERE    isdir = 0 AND cmd = 'delete'
+                AND id > (
+                        SELECT    MAX(id) - 1000
+                        FROM    logs
+                        WHERE    isdir = 0
+                    )
      ) D
      WHERE    CWp.writetime <= D.time
      AND (D.time - CWp.writetime) <= 3
@@ -67,14 +72,14 @@ static SUSPICIOUS_CRWD: &str = "
       (
        SELECT    *
        FROM    logs
-       WHERE    id > (    SELECT    MAX(id) - 2500
+       WHERE    id > (    SELECT    MAX(id) - 1000
            FROM    logs
            WHERE    isdir = 0 )
       ) A,
       (
        SELECT    *
        FROM    logs
-       WHERE    id > (    SELECT    MAX(id) - 2500
+       WHERE    id > (    SELECT    MAX(id) - 1000
            FROM    logs
            WHERE    isdir = 0 )
       ) B
@@ -92,14 +97,14 @@ static SUSPICIOUS_CRWD: &str = "
          (
           SELECT    *
           FROM    logs
-          WHERE    id > (    SELECT    MAX(id) - 2500
+          WHERE    id > (    SELECT    MAX(id) - 1000
               FROM    logs
               WHERE    isdir = 0 )
          ) C,
          (
           SELECT    *
           FROM    logs
-          WHERE    id > (    SELECT    MAX(id) - 2500
+          WHERE    id > (    SELECT    MAX(id) - 1000
               FROM    logs
               WHERE    isdir = 0 )
          ) D
@@ -121,6 +126,34 @@ static MOVE: &str = "
         AND cmd = 'move'
         AND isdir = 1
     ;";
+
+
+#[derive(Debug)]
+struct Id {
+    id: i32,
+}
+
+impl Id {
+    fn get_id(&self) -> i32 {
+        self.id
+    }
+}
+
+static MAXID: &str = "SELECT MAX(id) FROM logs;";
+static mut ID:i32 = 0;
+
+fn get_currentid(conn: &Connection) -> i32 {
+    let mut stmt = conn.prepare(MAXID).unwrap();
+
+    let max = stmt
+        .query_map(params![], |row| { Ok(Id { id: row.get(0).unwrap() }) })
+        .unwrap();
+    let mut ret: i32 = 0;
+    for m in max {
+        ret = m.unwrap().get_id();
+    }
+    ret
+}
 
 #[derive(Copy, Clone, Debug)]
 pub enum Type {
@@ -160,8 +193,8 @@ impl Log {
 }
 
 /// Retrieve SQL relations corresponding to given user action(qtype: MOVE | DELETE | SUSPICIOUS_CWD)
-pub fn select(qtype: Type) -> Vec<Log> {
-    let conn = Connection::open(DB).unwrap();
+pub fn select(conn: &Connection, qtype: Type) -> Vec<Log> {
+    get_currentid(conn);
 
     let mut stmt = conn
         .prepare(match qtype {
