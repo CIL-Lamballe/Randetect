@@ -1,9 +1,6 @@
 use rusqlite::{NO_PARAMS, params, Connection, Result};
 
-//const DB: &str = "/var/log/synolog/.SMBXFERDB";
-//const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB"; // For dev
-
-pub fn fmt_qdelete(id: i32, period: i32) -> String {
+fn fmt_qdelete(id: i32, period: i32) -> String {
     // period 100
     // id 2500
     format!(
@@ -20,7 +17,7 @@ pub fn fmt_qdelete(id: i32, period: i32) -> String {
     )
 }
 
-pub fn fmt_qsuspiciouscwd(id: i32, period: i32) -> String {
+fn fmt_qsuspiciouscwd(id: i32, period: i32) -> String {
     //id 2_500
     //period 3
     format!("SELECT D.username, D.ip
@@ -69,8 +66,10 @@ pub fn fmt_qsuspiciouscwd(id: i32, period: i32) -> String {
     ;", id, id, id, period)
 }
 
-static SUSPICIOUS_CRWD: &str = "
-     SELECT *
+fn fmt_qsuspiciouscrwd(id: i32, period: i32) -> String {
+    // 2_500
+    // 3
+    format!("SELECT *
      FROM
      (
       SELECT    A.ip, A.username, A.filename,
@@ -81,14 +80,14 @@ static SUSPICIOUS_CRWD: &str = "
       (
        SELECT    *
        FROM    logs
-       WHERE    id > (    SELECT    MAX(id) - 1000
+       WHERE    id > (    SELECT    MAX(id) - {}
            FROM    logs
            WHERE    isdir = 0 )
       ) A,
       (
        SELECT    *
        FROM    logs
-       WHERE    id > (    SELECT    MAX(id) - 1000
+       WHERE    id > (    SELECT    MAX(id) - {}
            FROM    logs
            WHERE    isdir = 0 )
       ) B
@@ -106,28 +105,29 @@ static SUSPICIOUS_CRWD: &str = "
          (
           SELECT    *
           FROM    logs
-          WHERE    id > (    SELECT    MAX(id) - 1000
+          WHERE    id > (    SELECT    MAX(id) - {}
               FROM    logs
               WHERE    isdir = 0 )
          ) C,
          (
           SELECT    *
           FROM    logs
-          WHERE    id > (    SELECT    MAX(id) - 1000
+          WHERE    id > (    SELECT    MAX(id) - {}
               FROM    logs
               WHERE    isdir = 0 )
          ) D
          WHERE    C.isdir = 0 AND D.isdir = 0
          AND C.filename = D.filename
          AND C.cmd = 'read' AND D.cmd = 'delete'
-         AND C.time <= D.time AND (D.time - C.time) <= 300
+         AND C.time <= D.time AND (D.time - C.time) <= {}
          ) RDp
          WHERE    CWp.btime = RDp.ctime
          AND RDp.deletedfilesize <= CWp.wrotefilesize
          AND RDp.deletedfilesize > 0
-         ;";
+         ;", id, id, id, id, period)
+}
 
-pub fn fmt_qmove(id: i32) -> String {
+fn fmt_qmove(id: i32) -> String {
     format!("SELECT username, ip, filename
              FROM logs
              WHERE id > ( SELECT MAX(id) - {}
@@ -210,7 +210,7 @@ pub fn select(conn: &Connection, qtype: Type) -> Vec<Log> {
         match qtype {
             Type::Delete => conn.prepare(&fmt_qdelete(2_500, 100)).unwrap(),
             Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(2_500, 3)).unwrap(),
-            Type::SuspiciousCrwd => conn.prepare(&fmt_qdelete(2_500, 100)).unwrap(),
+            Type::SuspiciousCrwd => conn.prepare(&fmt_qsuspiciouscrwd(2_500, 3)).unwrap(),
             Type::Move => conn.prepare(&fmt_qmove(2_500)).unwrap(),
         }
     };
