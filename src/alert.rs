@@ -4,13 +4,18 @@ pub mod sms {
     fn timestamp() -> String {
         let now = format!("{:?}", std::time::SystemTime::now());
         let now = format!("{}{}", &now[21..31], &now[42..51]);
-        println!("{}", now);
+        //println!("{}", now);
         now
     }
 
     pub fn send(cdtl: &Cdtl) {
         let text = format!("{};TEST Alert NAS new prg", cdtl.get_smsusr());
         println!("{}", text);
+
+        let tstamp = timestamp();
+
+        let arg = format!("open -u {},{} {}; put -O {} {}_sms.txt", cdtl.get_user(), cdtl.get_pwd(), cdtl.get_sys(), cdtl.get_folder(), tstamp);
+        println!("\narg:{}\n", arg);
     }
 }
 
