@@ -1,10 +1,12 @@
-use std::collections::HashMap;
-use std::{env, thread, time};
-use rusqlite::Connection;
-
 mod alert;
 mod parse;
 mod query;
+
+use std::{collections::HashMap, env, thread, time::Duration};
+use rusqlite::Connection;
+use parse::Behavior;
+use alert::{email, sms};
+use query::Type;
 
 const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB";
 
@@ -63,33 +65,33 @@ fn env_variables() -> Cdtl {
 fn main() {
     let var: Cdtl = env_variables();
 
-    let duration = time::Duration::from_millis(TIME);
+    let duration = Duration::from_millis(TIME);
 
     let conn = Connection::open(DB).unwrap();
 
     let mut list: HashMap<String, parse::UserInfo> = HashMap::new();
 
     //    loop {
-    let mut query = query::select(&conn, query::Type::Move);
-    query.extend(query::select(&conn, query::Type::Delete));
-    query.extend(query::select(&conn, query::Type::SuspiciousCwd));
+    let mut query = query::select(&conn, Type::Move);
+    query.extend(query::select(&conn,Type::Delete));
+    query.extend(query::select(&conn,Type::SuspiciousCwd));
 
     parse::log(query, &mut list);
     for user in list.iter() {
         let (name, info) = user;
         for beh in info.get_behaviors() {
             match beh {
-                parse::Behavior::Delete(c) if *c >= 50 => {
+                Behavior::Delete(c) if *c >= 50 => {
                    // println!("BAN of {} because he/she as been deleting {} files", name, *c);
-                    alert::email::send(&name, info, "Move");
+                    email::send(&name, info, "Move");
                 },
-                parse::Behavior::Suspicious(c) if *c >= 50 => {
+                Behavior::Suspicious(c) if *c >= 50 => {
                   //  println!("BAN of {} for having suspicious activity", name);
-                    alert::sms::send(&var, &name, info);
+                    sms::send(&var, &name, info);
                 },
-                parse::Behavior::Move(s) => {
+                Behavior::Move(s) => {
                   //  println!("{} moved the folder {}", name, *s);
-                    alert::email::send(&name, info, "Move");
+                    email::send(&name, info, "Move");
                 },
                 _ => (),
             }
