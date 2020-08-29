@@ -1,7 +1,6 @@
 pub mod sms {
-    use crate::Cdtl;
-    use std::fs::File;
-    use std::io::Write;
+    use crate::{Cdtl, parse::UserInfo};
+    use std::{fs::File, io::Write, time::SystemTime, process::Command};
 
     fn file(timestamp: &str, core: &str) -> String {
         let fname = format!("{}_sms.txt", timestamp);
@@ -11,13 +10,13 @@ pub mod sms {
     }
 
     fn timestamp() -> String {
-        let now = format!("{:?}", std::time::SystemTime::now());
+        let now = format!("{:?}", SystemTime::now());
         let now = format!("{}{}", &now[21..31], &now[42..51]);
         //println!("{}", now);
         now
     }
 
-    fn prepare(cdtl: &Cdtl, uname: &str, info: &crate::parse::UserInfo) -> (String, String) {
+    fn prepare(cdtl: &Cdtl, uname: &str, info: &UserInfo) -> (String, String) {
         let tstamp = timestamp();
         let text = format!("{};TEST Alert NAS\n{}\n{:?}\n", cdtl.get_smsusr(), uname, info);
         //println!("{}", text);
@@ -35,10 +34,10 @@ pub mod sms {
         (format!("lftp -c \"{}\"", arg), fname)
     }
 
-    pub fn send(cdtl: &Cdtl, uname: &str, info: &crate::parse::UserInfo) {
+    pub fn send(cdtl: &Cdtl, uname: &str, info: &UserInfo) {
         let (arg, fname) = prepare(cdtl, uname, info);
         //println!("\narg:{}\n{}\n", arg, fname);
-     //           let output = std::process::Command::new("bash")
+     //           let output = Command::new("bash")
      //               .arg("-c")
       //              .arg(arg)
      //               .output()
@@ -53,9 +52,12 @@ pub mod sms {
 }
 
 pub mod email {
+    use crate::parse::UserInfo;
+    use std::process::Command;
+
     const to: &str = "a.barthleemy@cil-lamballe.com";
 
-    pub fn send(user: &str, info: &crate::parse::UserInfo, act: &str) {
+    pub fn send(user: &str, info: &UserInfo, act: &str) {
         let ssmtp = "ssmtp ".to_string()
             + to
             + &format!(
@@ -69,7 +71,7 @@ pub mod email {
 
         //println!("{}", ssmtp);
 
-       // let output = std::process::Command::new("bash")
+       // let output = Command::new("bash")
        //     .arg("-c")
        //     .arg(ssmtp)
        //     .output()

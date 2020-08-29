@@ -1,7 +1,6 @@
 //use std::fs::File;
 //use std::io;
-use crate::query::Log;
-use crate::query::Type;
+use crate::query::{Log, Type};
 use std::collections::HashMap;
 
 /// Maximum of suspicious actions
