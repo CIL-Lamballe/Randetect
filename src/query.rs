@@ -6,10 +6,8 @@ fn fmt_qdelete(id: i32, period: i32) -> String {
     format!(
         "SELECT username, ip
              FROM   logs
-             WHERE  id > (  SELECT MAX(id) - {}
-                            FROM logs
-                            WHERE isdir = 0 )
-           AND cmd = 'delete'
+             WHERE  id > {} AND isdir = 0
+             AND cmd = 'delete'
            AND time > ( SELECT MAX(time)
             FROM logs ) - {}
         ;",
@@ -32,20 +30,12 @@ fn fmt_qsuspiciouscwd(id: i32, period: i32) -> String {
      (
       SELECT    *
       FROM    logs
-      WHERE    id > (
-          SELECT MAX(id) - {}
-          FROM    logs
-          WHERE    isdir = 0
-          )
+      WHERE    id > {} AND isdir = 0
      ) A,
      (
       SELECT    *
       FROM    logs
-      WHERE    id > (
-          SELECT    MAX(id) - {}
-          FROM    logs
-          WHERE    isdir = 0
-          )
+      WHERE    id > {} AND isdir = 0
      ) B
      WHERE    A.filename = B.filename
      AND A.cmd = 'create' AND B.cmd = 'write'
@@ -55,11 +45,7 @@ fn fmt_qsuspiciouscwd(id: i32, period: i32) -> String {
       SELECT    *
       FROM    logs
       WHERE    isdir = 0 AND cmd = 'delete'
-                AND id > (
-                        SELECT    MAX(id) - {}
-                        FROM    logs
-                        WHERE    isdir = 0
-                    )
+                AND id > {} AND isdir = 0
      ) D
      WHERE    CWp.writetime <= D.time
      AND (D.time - CWp.writetime) <= {}
@@ -84,16 +70,12 @@ fn fmt_qsuspiciouscrwd(id: i32, period: i32) -> String {
       (
        SELECT    *
        FROM    logs
-       WHERE    id > (    SELECT    MAX(id) - {}
-           FROM    logs
-           WHERE    isdir = 0 )
+       WHERE    id > {} AND isdir = 0
       ) A,
       (
        SELECT    *
        FROM    logs
-       WHERE    id > (    SELECT    MAX(id) - {}
-           FROM    logs
-           WHERE    isdir = 0 )
+       WHERE    id > {} AND isdir = 0
       ) B
       WHERE    A.isdir = 0 AND B.isdir = 0
      AND A.filename = B.filename
@@ -109,16 +91,12 @@ fn fmt_qsuspiciouscrwd(id: i32, period: i32) -> String {
          (
           SELECT    *
           FROM    logs
-          WHERE    id > (    SELECT    MAX(id) - {}
-              FROM    logs
-              WHERE    isdir = 0 )
+          WHERE    id > {} AND isdir = 0
          ) C,
          (
           SELECT    *
           FROM    logs
-          WHERE    id > (    SELECT    MAX(id) - {}
-              FROM    logs
-              WHERE    isdir = 0 )
+          WHERE    id > {} AND isdir = 0
          ) D
          WHERE    C.isdir = 0 AND D.isdir = 0
          AND C.filename = D.filename
@@ -137,8 +115,7 @@ fn fmt_qmove(id: i32) -> String {
     format!(
         "SELECT username, ip, filename
              FROM logs
-             WHERE id > ( SELECT MAX(id) - {}
-                          FROM logs )
+             WHERE id > {}
              AND cmd = 'move'
              AND isdir = 1;",
         id
@@ -157,9 +134,8 @@ impl Id {
 }
 
 static MAXID: &str = "SELECT MAX(id) FROM logs;";
-static mut ID: i32 = 0;
 
-fn get_currentid(conn: &Connection) -> i32 {
+pub fn updated_id(conn: &Connection) -> i32 {
     let mut stmt = conn.prepare(MAXID).unwrap();
 
     let max = stmt
@@ -215,15 +191,13 @@ impl Log {
 
 /// Retrieve SQL relations corresponding to given user action(qtype: Move | Delete | SuspiciousCwd
 /// | SuspiciousCrwd)
-pub fn select(conn: &Connection, qtype: Type) -> Vec<Log> {
-    get_currentid(conn);
-
+pub fn select(conn: &Connection, qtype: Type, id: &i32) -> Vec<Log> {
     let mut stmt = {
         match qtype {
-            Type::Delete => conn.prepare(&fmt_qdelete(2_500, 100)).unwrap(),
-            Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(2_500, 3)).unwrap(),
-            Type::SuspiciousCrwd => conn.prepare(&fmt_qsuspiciouscrwd(2_500, 3)).unwrap(),
-            Type::Move => conn.prepare(&fmt_qmove(2_500)).unwrap(),
+            Type::Delete => conn.prepare(&fmt_qdelete(*id, 100)).unwrap(),
+            Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(*id, 3)).unwrap(),
+            Type::SuspiciousCrwd => conn.prepare(&fmt_qsuspiciouscrwd(*id, 3)).unwrap(),
+            Type::Move => conn.prepare(&fmt_qmove(*id)).unwrap(),
         }
     };
 
