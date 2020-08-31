@@ -1,6 +1,6 @@
 pub mod sms {
-    use crate::{Cdtl, parse::UserInfo};
-    use std::{fs::File, io::Write, time::SystemTime, process::Command};
+    use crate::{parse::UserInfo, Cdtl};
+    use std::{fs::File, io::Write, process::Command, time::SystemTime};
 
     fn file(timestamp: &str, core: &str) -> String {
         let fname = format!("{}_sms.txt", timestamp);
@@ -18,18 +18,14 @@ pub mod sms {
 
     fn prepare(cdtl: &Cdtl, uname: &str, info: &UserInfo) -> (String, String) {
         let tstamp = timestamp();
-        let text = format!("{};TEST Alert NAS\n{}\n{:?}\n", cdtl.smsusr, uname, info);
-        //println!("{}", text);
+        let text = format!("{};TEST Alert NAS   user:{}   {:?}\n", cdtl.smsusr, uname, info);
+        println!("{}", text);
 
         let fname = file(&tstamp, &text);
 
         let arg = format!(
             "open -u {},{} {}; put -O {} {}_sms.txt",
-            cdtl.user,
-            cdtl.pwd,
-            cdtl.sys,
-            cdtl.folder,
-            tstamp
+            cdtl.user, cdtl.pwd, cdtl.sys, cdtl.folder, tstamp
         );
         (format!("lftp -c \"{}\"", arg), fname)
     }
@@ -37,11 +33,11 @@ pub mod sms {
     pub fn send(cdtl: &Cdtl, uname: &str, info: &UserInfo) {
         let (arg, fname) = prepare(cdtl, uname, info);
         //println!("\narg:{}\n{}\n", arg, fname);
-     //           let output = Command::new("bash")
-     //               .arg("-c")
-      //              .arg(arg)
-     //               .output()
-     //               .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
+        let output = Command::new("bash")
+            .arg("-c")
+            .arg(arg)
+            .output()
+            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
 
         // Debug
         //        println!("status: {}", output.status);
@@ -69,13 +65,13 @@ pub mod email {
                 )
             );
 
-        //println!("{}", ssmtp);
+       // println!("{}", ssmtp);
 
-       // let output = Command::new("bash")
-       //     .arg("-c")
-       //     .arg(ssmtp)
-       //     .output()
-       //     .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
+        let output = Command::new("bash")
+            .arg("-c")
+            .arg(ssmtp)
+            .output()
+            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
 
         // Debug
         //        println!("status: {}", output.status);
