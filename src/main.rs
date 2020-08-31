@@ -18,28 +18,6 @@ pub struct Cdtl {
     smsusr: String,
 }
 
-impl Cdtl {
-    pub fn get_user(&self) -> &str {
-        &self.user
-    }
-
-    pub fn get_pwd(&self) -> &str {
-        &self.pwd
-    }
-
-    pub fn get_sys(&self) -> &str {
-        &self.sys
-    }
-
-    pub fn get_folder(&self) -> &str {
-        &self.folder
-    }
-
-    pub fn get_smsusr(&self) -> &str {
-        &self.smsusr
-    }
-}
-
 /// Loop delay in milliseconds
 const TIME: u64 = 2_000;
 

@@ -18,17 +18,17 @@ pub mod sms {
 
     fn prepare(cdtl: &Cdtl, uname: &str, info: &UserInfo) -> (String, String) {
         let tstamp = timestamp();
-        let text = format!("{};TEST Alert NAS\n{}\n{:?}\n", cdtl.get_smsusr(), uname, info);
+        let text = format!("{};TEST Alert NAS\n{}\n{:?}\n", cdtl.smsusr, uname, info);
         //println!("{}", text);
 
         let fname = file(&tstamp, &text);
 
         let arg = format!(
             "open -u {},{} {}; put -O {} {}_sms.txt",
-            cdtl.get_user(),
-            cdtl.get_pwd(),
-            cdtl.get_sys(),
-            cdtl.get_folder(),
+            cdtl.user,
+            cdtl.pwd,
+            cdtl.sys,
+            cdtl.folder,
             tstamp
         );
         (format!("lftp -c \"{}\"", arg), fname)
