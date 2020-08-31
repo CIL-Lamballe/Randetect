@@ -51,39 +51,42 @@ fn main() {
         Ok(conn) => conn,
     };
     let mut id = query::updated_id(&conn) - 2_500;
-   // println!("Id:{}", id);
+    println!("Id:{}", id);
 
     let mut list: HashMap<String, parse::UserInfo> = HashMap::new();
 
-    //    loop {
+        loop {
     let mut query = query::select(&conn, Type::Move, &id);
     query.extend(query::select(&conn, Type::Delete, &id));
     query.extend(query::select(&conn, Type::SuspiciousCwd, &id));
 
     id = query::updated_id(&conn);
+    println!("Id:{}", id);
 
     parse::log(query, &mut list);
+    println!("\n\n----------USERS INFO-------------");
     for user in list.iter() {
         let (name, info) = user;
         for beh in info.get_behaviors() {
             match beh {
                 Behavior::Delete(c) if *c >= 50 => {
-                    // println!("BAN of {} because he/she as been deleting {} files", name, *c);
-                    email::send(&name, info, "Move");
+                     println!("BAN of {} because he/she as been deleting {} files", name, *c);
+                    //email::send(&name, info, "Move");
                 }
                 Behavior::Suspicious(c) if *c >= 50 => {
-                    //  println!("BAN of {} for having suspicious activity", name);
-                    sms::send(&var, &name, info);
+                      println!("BAN of {} for having suspicious activity", name);
+                    //sms::send(&var, &name, info);
                 }
                 Behavior::Move(s) => {
-                    //  println!("{} moved the folder {}", name, *s);
-                    email::send(&name, info, "Move");
+                      println!("{} moved the folder {}", name, *s);
+                    //email::send(&name, info, "Move");
                 }
                 _ => (),
             }
         }
-        // println!("{:?}",user.UserInfo);
+         println!("{:?}", user);
     }
-    // thread::sleep(duration);
-    //    }
+         println!("==-==-==\n");
+     thread::sleep(duration);
+        }
 }
