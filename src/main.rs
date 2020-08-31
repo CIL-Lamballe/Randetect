@@ -8,8 +8,8 @@ use query::Type;
 use rusqlite::Connection;
 use std::{collections::HashMap, env, thread, time::Duration};
 
-//const DB: &str = "/var/log/synolog/.SMBXFERDB";
-const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB";
+const DB: &str = "/var/log/synolog/.SMBXFERDB";
+//const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB";
 
 pub struct Cdtl {
     user: String,
