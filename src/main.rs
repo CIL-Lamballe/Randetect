@@ -45,7 +45,10 @@ fn main() {
 
     let duration = Duration::from_millis(TIME);
 
-    let conn = Connection::open(DB).unwrap();
+    let conn = match Connection::open(DB) {
+        Err(conn) => panic!("Could not reach/open database {}", DB),
+        Ok(conn) => conn,
+    };
 
     let mut list: HashMap<String, parse::UserInfo> = HashMap::new();
 
