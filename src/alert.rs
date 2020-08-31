@@ -1,6 +1,6 @@
 pub mod sms {
     use crate::{parse::UserInfo, Cdtl};
-    use std::{fs::File, io::Write, process::Command, time::SystemTime};
+    use std::{fs, fs::File, io::Write, process::Command, time::SystemTime};
 
     fn file(timestamp: &str, core: &str) -> String {
         let fname = format!("{}_sms.txt", timestamp);
@@ -43,7 +43,7 @@ pub mod sms {
         //        println!("status: {}", output.status);
         //        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
         //        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
-        std::fs::remove_file(fname);
+        fs::remove_file(fname);
     }
 }
 
@@ -51,11 +51,11 @@ pub mod email {
     use crate::parse::UserInfo;
     use std::process::Command;
 
-    const to: &str = "a.barthleemy@cil-lamballe.com";
+    const TO: &str = "a.barthleemy@cil-lamballe.com";
 
     pub fn send(user: &str, info: &UserInfo, act: &str) {
         let ssmtp = "ssmtp ".to_string()
-            + to
+            + TO
             + &format!(
                 " <<< \"{}\"",
                 format!(
