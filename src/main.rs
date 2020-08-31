@@ -2,11 +2,11 @@ mod alert;
 mod parse;
 mod query;
 
-use std::{collections::HashMap, env, thread, time::Duration};
-use rusqlite::Connection;
-use parse::Behavior;
 use alert::{email, sms};
+use parse::Behavior;
 use query::Type;
+use rusqlite::Connection;
+use std::{collections::HashMap, env, thread, time::Duration};
 
 const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB";
 
@@ -51,8 +51,8 @@ fn main() {
 
     //    loop {
     let mut query = query::select(&conn, Type::Move);
-    query.extend(query::select(&conn,Type::Delete));
-    query.extend(query::select(&conn,Type::SuspiciousCwd));
+    query.extend(query::select(&conn, Type::Delete));
+    query.extend(query::select(&conn, Type::SuspiciousCwd));
 
     parse::log(query, &mut list);
     for user in list.iter() {
@@ -60,17 +60,17 @@ fn main() {
         for beh in info.get_behaviors() {
             match beh {
                 Behavior::Delete(c) if *c >= 50 => {
-                   // println!("BAN of {} because he/she as been deleting {} files", name, *c);
+                    // println!("BAN of {} because he/she as been deleting {} files", name, *c);
                     email::send(&name, info, "Move");
-                },
+                }
                 Behavior::Suspicious(c) if *c >= 50 => {
-                  //  println!("BAN of {} for having suspicious activity", name);
+                    //  println!("BAN of {} for having suspicious activity", name);
                     sms::send(&var, &name, info);
-                },
+                }
                 Behavior::Move(s) => {
-                  //  println!("{} moved the folder {}", name, *s);
+                    //  println!("{} moved the folder {}", name, *s);
                     email::send(&name, info, "Move");
-                },
+                }
                 _ => (),
             }
         }

@@ -1,10 +1,10 @@
-use rusqlite::{NO_PARAMS, params, Connection, Result};
+use rusqlite::{params, Connection, Result, NO_PARAMS};
 
 fn fmt_qdelete(id: i32, period: i32) -> String {
     // period 100
     // id 2500
     format!(
-            "SELECT username, ip
+        "SELECT username, ip
              FROM   logs
              WHERE  id > (  SELECT MAX(id) - {}
                             FROM logs
@@ -12,15 +12,16 @@ fn fmt_qdelete(id: i32, period: i32) -> String {
            AND cmd = 'delete'
            AND time > ( SELECT MAX(time)
             FROM logs ) - {}
-        ;", id, period
-
+        ;",
+        id, period
     )
 }
 
 fn fmt_qsuspiciouscwd(id: i32, period: i32) -> String {
     //id 2_500
     //period 3
-    format!("SELECT D.username, D.ip
+    format!(
+        "SELECT D.username, D.ip
              FROM
             (
      SELECT    A.ip, A.username, A.filename,
@@ -63,13 +64,16 @@ fn fmt_qsuspiciouscwd(id: i32, period: i32) -> String {
      WHERE    CWp.writetime <= D.time
      AND (D.time - CWp.writetime) <= {}
      AND D.filesize <= CWp.wrotefilesize
-    ;", id, id, id, period)
+    ;",
+        id, id, id, period
+    )
 }
 
 fn fmt_qsuspiciouscrwd(id: i32, period: i32) -> String {
     // 2_500
     // 3
-    format!("SELECT *
+    format!(
+        "SELECT *
      FROM
      (
       SELECT    A.ip, A.username, A.filename,
@@ -124,18 +128,22 @@ fn fmt_qsuspiciouscrwd(id: i32, period: i32) -> String {
          WHERE    CWp.btime = RDp.ctime
          AND RDp.deletedfilesize <= CWp.wrotefilesize
          AND RDp.deletedfilesize > 0
-         ;", id, id, id, id, period)
+         ;",
+        id, id, id, id, period
+    )
 }
 
 fn fmt_qmove(id: i32) -> String {
-    format!("SELECT username, ip, filename
+    format!(
+        "SELECT username, ip, filename
              FROM logs
              WHERE id > ( SELECT MAX(id) - {}
                           FROM logs )
              AND cmd = 'move'
-             AND isdir = 1;", id)
+             AND isdir = 1;",
+        id
+    )
 }
-
 
 #[derive(Debug)]
 struct Id {
@@ -149,13 +157,17 @@ impl Id {
 }
 
 static MAXID: &str = "SELECT MAX(id) FROM logs;";
-static mut ID:i32 = 0;
+static mut ID: i32 = 0;
 
 fn get_currentid(conn: &Connection) -> i32 {
     let mut stmt = conn.prepare(MAXID).unwrap();
 
     let max = stmt
-        .query_map(params![], |row| { Ok(Id { id: row.get(0).unwrap() }) })
+        .query_map(params![], |row| {
+            Ok(Id {
+                id: row.get(0).unwrap(),
+            })
+        })
         .unwrap();
     let mut ret: i32 = 0;
     for m in max {
@@ -230,7 +242,7 @@ pub fn select(conn: &Connection, qtype: Type) -> Vec<Log> {
 
     let mut relation: Vec<Log> = Vec::new();
     for each in logs {
-       //      println!("here: {:?}", each);
+        //      println!("here: {:?}", each);
         match each {
             Ok(t) => relation.push(t),
             Err(e) => (),
