@@ -50,7 +50,7 @@ fn main() {
         Err(conn) => panic!("Could not reach/open database {}", DB),
         Ok(conn) => conn,
     };
-    let mut id = query::updated_id(&conn) - 2_500;
+    let mut id = query::updated_id(&conn);// - 2_500;
     loop {
         let mut list: HashMap<String, parse::UserInfo> = HashMap::new();
 
