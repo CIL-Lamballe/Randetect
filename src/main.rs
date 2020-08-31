@@ -8,7 +8,8 @@ use query::Type;
 use rusqlite::Connection;
 use std::{collections::HashMap, env, thread, time::Duration};
 
-const DB: &str = "/var/log/synolog/.SMBXFERDB";
+//const DB: &str = "/var/log/synolog/.SMBXFERDB";
+const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB";
 
 pub struct Cdtl {
     user: String,
@@ -49,13 +50,17 @@ fn main() {
         Err(conn) => panic!("Could not reach/open database {}", DB),
         Ok(conn) => conn,
     };
+    let mut id = query::updated_id(&conn) - 2_500;
+   // println!("Id:{}", id);
 
     let mut list: HashMap<String, parse::UserInfo> = HashMap::new();
 
     //    loop {
-    let mut query = query::select(&conn, Type::Move);
-    query.extend(query::select(&conn, Type::Delete));
-    query.extend(query::select(&conn, Type::SuspiciousCwd));
+    let mut query = query::select(&conn, Type::Move, &id);
+    query.extend(query::select(&conn, Type::Delete, &id));
+    query.extend(query::select(&conn, Type::SuspiciousCwd, &id));
+
+    id = query::updated_id(&conn);
 
     parse::log(query, &mut list);
     for user in list.iter() {
