@@ -18,7 +18,10 @@ pub mod sms {
 
     fn prepare(cdtl: &Cdtl, uname: &str, info: &UserInfo) -> (String, String) {
         let tstamp = timestamp();
-        let text = format!("{};TEST Alert NAS   user:{}   {:?}\n", cdtl.smsusr, uname, info);
+        let text = format!(
+            "{};TEST Alert NAS   user:{}   {:?}\n",
+            cdtl.smsusr, uname, info
+        );
         println!("{}", text);
 
         let fname = file(&tstamp, &text);
@@ -65,7 +68,7 @@ pub mod email {
                 )
             );
 
-       // println!("{}", ssmtp);
+        // println!("{}", ssmtp);
 
         let output = Command::new("bash")
             .arg("-c")
