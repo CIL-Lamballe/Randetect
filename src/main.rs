@@ -67,7 +67,7 @@ fn main() {
         query.extend(query::select(&conn, Type::Delete, &id));
         query.extend(query::select(&conn, Type::SuspiciousCwd, &id));
 
-        id = query::updated_id(&conn);
+        id = query::updated_id(&conn) - 2_500;
 
         parse::log(query, &mut list);
 
