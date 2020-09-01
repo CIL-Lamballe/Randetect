@@ -78,14 +78,14 @@ fn main() {
             for beh in info.get_behaviors() {
                 match beh {
                     Behavior::Delete(c) if *c >= BAN_LIMIT => {
-                        nas::ban(&name, info, *c);
+                        nas::ban(info);
                         email::send(&name, info, "delete");
                         sms::send(&var, format!(
                                 "Alert NAS user: {} banned because of deleting {} files from ip:{:?}"
                                 , name, *c, info.get_ips()));
                     }
                     Behavior::Suspicious(c) if *c >= BAN_LIMIT => {
-                        nas::ban(&name, info, *c);
+                        nas::ban(info);
                         shutdown += 1;
                         email::send(&name, info, "Suspicious");
                         sms::send(&var, format!(
