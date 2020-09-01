@@ -10,7 +10,8 @@ use rusqlite::Connection;
 use std::{collections::HashMap, env, thread, time::Duration};
 
 /// Path to file log db
-const DB: &str = "/var/log/synolog/.SMBXFERDB";
+//const DB: &str = "/var/log/synolog/.SMBXFERDB";
+const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB";
 
 /// Maximum of suspicious actions
 const BAN_LIMIT: i32 = 50;
@@ -54,7 +55,8 @@ fn main() {
         Err(conn) => panic!("Could not reach/open database {} {}", DB, conn),
         Ok(conn) => conn,
     };
-    let mut id = query::updated_id(&conn);// - 2_500;
+    //let mut id = query::updated_id(&conn);// - 2_500;
+    let mut id = query::updated_id(&conn) - 2_500;
     loop {
         let mut list: HashMap<String, parse::UserInfo> = HashMap::new();
 
@@ -74,11 +76,10 @@ fn main() {
                         email::send(&name, info, "Delete");
                     }
                     Behavior::Suspicious(c) if *c >= BAN_LIMIT => {
-                        println!("BAN of {} for having suspicious activity", name);
-                        sms::send(&var, &name, info);
+                        nas::ban(&name, info, *c);
+                        //sms::send(&var, &name, info);
                     }
                     Behavior::Move(s) => {
-                        println!("{} moved the folder {}", name, *s);
                         email::send(&name, info, "Move");
                     }
                     _ => (),
