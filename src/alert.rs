@@ -40,16 +40,16 @@ pub mod sms {
 
         println!("\n{:?}\n", arg);
 
-//        let output = Command::new("bash")
-//            .arg("-c")
-//            .arg(arg)
-//            .output()
-//            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
-//
-//        // Debug
-//        println!("status: {}", output.status);
-//        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-//        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+        //        let output = Command::new("bash")
+        //            .arg("-c")
+        //            .arg(arg)
+        //            .output()
+        //            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
+        //
+        //        // Debug
+        //        println!("status: {}", output.status);
+        //        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        //        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
         fs::remove_file(fname).unwrap();
     }
 }
