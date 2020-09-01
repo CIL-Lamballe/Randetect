@@ -3,9 +3,6 @@
 use crate::query::{Log, Type};
 use std::collections::HashMap;
 
-/// Maximum of suspicious actions
-const BAN_LIMIT: u16 = 50;
-
 #[derive(Debug)]
 pub enum Behavior {
     Delete(i32),     // Containing nb of files deleted.
@@ -59,7 +56,6 @@ impl UserInfo {
                 }
             }
             Type::Move => self.kind.push(Behavior::Move(dir)),
-            _ => (),
         }
         if !self.ip.contains(&newip) {
             self.ip.push(newip);
