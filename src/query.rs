@@ -1,8 +1,6 @@
 use rusqlite::{params, Connection, Result};
 
 fn fmt_qdelete(id: i32, period: i32) -> String {
-    // period 100
-    // id 2500
     format!(
         "SELECT username, ip
              FROM   logs
@@ -16,8 +14,6 @@ fn fmt_qdelete(id: i32, period: i32) -> String {
 }
 
 fn fmt_qsuspiciouscwd(id: i32, period: i32) -> String {
-    //id 2_500
-    //period 3
     format!(
         "SELECT D.username, D.ip
              FROM
@@ -56,8 +52,6 @@ fn fmt_qsuspiciouscwd(id: i32, period: i32) -> String {
 }
 
 fn fmt_qsuspiciouscrwd(id: i32, period: i32) -> String {
-    // 2_500
-    // 3
     format!(
         "SELECT *
      FROM
