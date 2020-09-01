@@ -1,7 +1,7 @@
 use crate::parse::UserInfo;
 use std::process::Command;
 
-pub fn ban(user: &str, info: &UserInfo, attempt: i32) {
+pub fn ban(info: &UserInfo) {
     for ip in info.get_ips().iter() {
         let iptables = "iptables -A INPUT -s ".to_string() + ip + " -j DROP";
         // println!("{}", iptables);
