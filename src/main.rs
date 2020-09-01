@@ -15,7 +15,6 @@ macro_rules! nas_shutdown {
     };
 }
 
-/// Path to file log db
 const DB: &str = "/var/log/synolog/.SMBXFERDB";
 
 /// Maximum of suspicious actions
@@ -77,14 +76,14 @@ fn main() {
             for beh in info.get_behaviors() {
                 match beh {
                     Behavior::Delete(c) if *c >= BAN_LIMIT => {
-                        nas::ban(&conn, info);
+                        nas::ban(info);
                         email::send(&name, info, "delete");
                         sms::send(&var, format!(
                                 "Alert NAS user: {} banned because of deleting {} files from ip:{:?}"
                                 , name, *c, info.get_ips()));
                     }
                     Behavior::Suspicious(c) if *c >= BAN_LIMIT => {
-                        nas::ban(&conn, info);
+                        nas::ban(info);
                         shutdown += 1;
                         email::send(&name, info, "Suspicious");
                         sms::send(&var, format!(
