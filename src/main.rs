@@ -78,7 +78,10 @@ fn main() {
                     Behavior::Suspicious(c) if *c >= BAN_LIMIT => {
                         nas::ban(&name, info, *c);
                         shutdown += 1;
-                        sms::send(&var, format!("Alert NAS user: {} banned because of suspicious activity {} times ip:{:?}", name, *c, info.get_ips()));
+                        sms::send(&var,
+                            format!(
+                                "Alert NAS user: {} banned because of suspicious activity {} times ip:{:?}"
+                                , name, *c, info.get_ips()));
                     }
                     Behavior::Move(s) => {
                         email::send(&name, info, "Move");
