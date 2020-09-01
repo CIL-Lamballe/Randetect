@@ -2,40 +2,59 @@ pub mod sms {
     use crate::{parse::UserInfo, Cdtl};
     use std::{fs, fs::File, io::Write, process::Command, time::SystemTime};
 
-    fn file(timestamp: &str, core: &str) -> String {
-        let fname = format!("{}_sms.txt", timestamp);
+    fn digits(s: &str) -> String {
+        let mut digits = String::new();
+        for c in s.chars() {
+            if c.is_ascii_digit() {
+                digits.push(c);
+            }
+        }
+        digits
+    }
+
+    fn file(text: &str) -> String {
+        let now = format!("{:?}", SystemTime::now());
+        //        println!("{:?}", now);
+        let now = digits(&now);
+        //        println!("{:?}", now);
+
+        let fname = format!("{}_sms.txt", now);
+        //        println!("{:?}", fname);
+
         let mut file = File::create(&fname).unwrap();
-        file.write(core.as_bytes()).unwrap();
+        file.write(text.as_bytes()).unwrap();
         fname
     }
 
-    fn timestamp() -> String {
-        let now = format!("{:?}", SystemTime::now());
-        let now = format!("{}{}", &now[21..31], &now[42..51]);
-        //println!("{}", now);
-        now
-    }
+    //    fn format(cdtl: &Cdtl, uname: &str, info: &UserInfo) -> String {
+    //        let text = format!(
+    //            "{};TEST Alert NAS   user:{}   {:?}\n",
+    //            cdtl.smsusr, uname, info
+    //        );
+    //        println!("{}", text);
+    //
+    //        let fname = file(&tstamp, &text);
+    //
+    //        let arg = format!(
+    //            "open -u {},{} {}; put -O {} {}_sms.txt",
+    //            cdtl.user, cdtl.pwd, cdtl.sys, cdtl.folder, tstamp
+    //        );
+    //        (format!("lftp -c \"{}\"", arg), fname)
+    //    }
 
-    fn prepare(cdtl: &Cdtl, uname: &str, info: &UserInfo) -> (String, String) {
-        let tstamp = timestamp();
-        let text = format!(
-            "{};TEST Alert NAS   user:{}   {:?}\n",
-            cdtl.smsusr, uname, info
-        );
-        println!("{}", text);
+    pub fn send(cdtl: &Cdtl, text: &str) {
+        // write down text in a file which is the sms to be sent
+        let smsfile = file(text);
 
-        let fname = file(&tstamp, &text);
-
+        // Format the command to send sms
         let arg = format!(
-            "open -u {},{} {}; put -O {} {}_sms.txt",
-            cdtl.user, cdtl.pwd, cdtl.sys, cdtl.folder, tstamp
+            "open -u {},{} {}; put -O {} {}",
+            cdtl.user, cdtl.pwd, cdtl.sys, cdtl.folder, smsfile
         );
-        (format!("lftp -c \"{}\"", arg), fname)
-    }
+        let arg = format!("lftp -c \"{}\"", arg);
 
-    pub fn send(cdtl: &Cdtl, uname: &str, info: &UserInfo) {
-        let (arg, fname) = prepare(cdtl, uname, info);
-        //println!("\narg:{}\n{}\n", arg, fname);
+        println!("\n{:?}\n", arg);
+
         let output = Command::new("bash")
             .arg("-c")
             .arg(arg)
@@ -43,10 +62,10 @@ pub mod sms {
             .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
 
         // Debug
-                println!("status: {}", output.status);
-                println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-                println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
-        fs::remove_file(fname).unwrap();
+        println!("status: {}", output.status);
+        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+        fs::remove_file(smsfile).unwrap();
     }
 }
 
@@ -70,15 +89,15 @@ pub mod email {
 
         // println!("{}", ssmtp);
 
-//        let output = Command::new("bash")
-//            .arg("-c")
-//            .arg(ssmtp)
-//            .output()
-//            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
-//
-//        // Debug
-//                println!("status: {}", output.status);
-//                println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-//                println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+        //        let output = Command::new("bash")
+        //            .arg("-c")
+        //            .arg(ssmtp)
+        //            .output()
+        //            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
+        //
+        //        // Debug
+        //                println!("status: {}", output.status);
+        //                println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        //                println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
     }
 }

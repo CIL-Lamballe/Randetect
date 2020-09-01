@@ -1,7 +1,7 @@
 mod alert;
+mod nas;
 mod parse;
 mod query;
-mod nas;
 
 use alert::{email, sms};
 use parse::Behavior;
@@ -80,7 +80,7 @@ fn main() {
                     Behavior::Suspicious(c) if *c >= BAN_LIMIT => {
                         nas::ban(&name, info, *c);
                         shutdown += 1;
-                        //sms::send(&var, &name, info);
+                        sms::send(&var, "Hello this is a sms");
                     }
                     Behavior::Move(s) => {
                         email::send(&name, info, "Move");
@@ -88,7 +88,9 @@ fn main() {
                     _ => (),
                 }
             }
-            if shutdown > 1 { nas::poweroff(); }
+            if shutdown > 1 {
+                nas::poweroff();
+            }
         }
         thread::sleep(duration);
     }
