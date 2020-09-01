@@ -5,6 +5,9 @@ An implementation of a naive ransomware detection algorithm running on Synology 
 This project aims at building a deamon started at DSM boot time. The deamon will monitors the changes made to the filesystem by its clients, filtering it with a customizable set of rules and banning ips or powering off the NAS depending on criticity level.
 
 
+
+---
+
 ## NAS Log Queries Relational Algebra
 
 ```
@@ -30,6 +33,10 @@ xmin: Time between a create and a write operation on a same file.
 
 Encrypting does not inherently make a file larger but most of the time it does, for this reason we randomly checksum the files been raised by the alert.
 
+
+
+---
+
 ## Run
 
 In order to run the program, some env variables needs to be set.
@@ -46,4 +53,25 @@ Example:
 
 ```shell=
 CRDTL=ABCDEFGHIJ01234567 TARGETSYS=62.186.103.42 FOLDER=/var/log/sms SMSUSR=SMS-TOTO ./randetect
+```
+
+
+
+---
+
+## Build
+
+Build a non dynamic binary. 2 architectures depending on model.
+
+
+- aarch64 - Model DS418
+
+```shell=
+cross build --target=aarch64-unknown-linux-musl --release
+```
+
+- x86\_64  - Models RS814RP+, RS815RP+, RS818RP+...
+
+```shell=
+cross build --target=x86_64-unknown-linux-musl --release
 ```
