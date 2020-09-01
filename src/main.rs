@@ -9,6 +9,12 @@ use query::Type;
 use rusqlite::Connection;
 use std::{collections::HashMap, env, thread, time::Duration};
 
+macro_rules! nas_shutdown {
+    () => {
+        String::from("Alert NAS shutdown ! Because of too many suspicious activities !")
+    };
+}
+
 /// Path to file log db
 //const DB: &str = "/var/log/synolog/.SMBXFERDB";
 const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB";
@@ -90,6 +96,7 @@ fn main() {
                 }
             }
             if shutdown > 1 {
+                sms::send(&var, nas_shutdown!());
                 nas::poweroff();
             }
         }
