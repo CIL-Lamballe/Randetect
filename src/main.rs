@@ -17,7 +17,6 @@ macro_rules! nas_shutdown {
 
 /// Path to file log db
 const DB: &str = "/var/log/synolog/.SMBXFERDB";
-//const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB";
 
 /// Maximum of suspicious actions
 const BAN_LIMIT: i32 = 50;
@@ -59,8 +58,8 @@ fn main() {
         Err(conn) => panic!("Could not reach/open database {} {}", DB, conn),
         Ok(conn) => conn,
     };
-    let mut id = query::updated_id(&conn); // - 2_500;
-                                           //let mut id = query::updated_id(&conn) - 2_500;
+    let mut id = query::updated_id(&conn);
+
     loop {
         let mut list: HashMap<String, parse::UserInfo> = HashMap::new();
 
