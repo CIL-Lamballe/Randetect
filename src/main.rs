@@ -67,6 +67,8 @@ fn main() {
         id = query::updated_id(&conn);
 
         parse::log(query, &mut list);
+
+        let mut shutdown = 0;
         for user in list.iter() {
             let (name, info) = user;
             for beh in info.get_behaviors() {
@@ -77,6 +79,7 @@ fn main() {
                     }
                     Behavior::Suspicious(c) if *c >= BAN_LIMIT => {
                         nas::ban(&name, info, *c);
+                        shutdown += 1;
                         //sms::send(&var, &name, info);
                     }
                     Behavior::Move(s) => {
@@ -85,6 +88,7 @@ fn main() {
                     _ => (),
                 }
             }
+            if shutdown > 1 { nas::poweroff(); }
         }
         thread::sleep(duration);
     }
