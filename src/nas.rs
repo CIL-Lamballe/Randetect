@@ -1,11 +1,13 @@
-use std::process::Command;
-use rusqlite::{params, Connection};
 use crate::parse::UserInfo;
+use rusqlite::{params, Connection};
+use std::{process::Command, time::SystemTime};
 
-use std::time::SystemTime;
+const AUTOBLOCK: &str = "/etc/synoautoblock.db";
 
 fn fmt_insertban(ip: &str) -> String {
-    let time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
+    let time = SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap();
     let epoch = time.as_secs().to_string(); // get time since epoch
     format!(
         "INSERT INTO AutoBlockIP
@@ -17,15 +19,21 @@ fn fmt_insertban(ip: &str) -> String {
              '0000:0000:0000:0000:0000:0000:0000:0000',
              '0',
              '0'
-             );", ip, epoch
-        )
+             );",
+        ip, epoch
+    )
 }
 
-pub fn ban(conn: &Connection, info: &UserInfo) {
+pub fn ban(info: &UserInfo) {
+    let conn = match Connection::open(AUTOBLOCK) {
+        Err(conn) => panic!("Could not reach/open database {} {}", AUTOBLOCK, conn),
+        Ok(conn) => conn,
+    };
+
     for ip in info.get_ips().iter() {
         let insertstmt = fmt_insertban(&ip);
-        println!("{}", &insertstmt);
-        conn.execute(&insertstmt, params![],).unwrap();
+        //println!("{}", &insertstmt);
+        conn.execute(&insertstmt, params![]).unwrap();
     }
 }
 
