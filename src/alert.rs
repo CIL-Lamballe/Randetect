@@ -54,7 +54,7 @@ pub mod email {
     use crate::parse::UserInfo;
     use std::process::Command;
 
-    const TO: &str = "a.barthleemy@cil-lamballe.com";
+    const TO: &str = "a.barthelemy@cil-lamballe.com";
 
     pub fn send(user: &str, info: &UserInfo, act: &str) {
         let ssmtp = "ssmtp ".to_string()
