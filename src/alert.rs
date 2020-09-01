@@ -26,46 +26,35 @@ pub mod sms {
         fname
     }
 
-    //    fn format(cdtl: &Cdtl, uname: &str, info: &UserInfo) -> String {
-    //        let text = format!(
-    //            "{};TEST Alert NAS   user:{}   {:?}\n",
-    //            cdtl.smsusr, uname, info
-    //        );
-    //        println!("{}", text);
-    //
-    //        let fname = file(&tstamp, &text);
-    //
-    //        let arg = format!(
-    //            "open -u {},{} {}; put -O {} {}_sms.txt",
-    //            cdtl.user, cdtl.pwd, cdtl.sys, cdtl.folder, tstamp
-    //        );
-    //        (format!("lftp -c \"{}\"", arg), fname)
-    //    }
+    pub fn format(user: &str, msg: String) -> String {
+        format!("Alert NAS user: {} {}", user, msg)
+    }
 
     pub fn send(cdtl: &Cdtl, text: &str) {
         // write down text in a file which is the sms to be sent
-        let smsfile = file(text);
+        println!("{}", text);
+        let fname = file(text);
 
         // Format the command to send sms
         let arg = format!(
             "open -u {},{} {}; put -O {} {}",
-            cdtl.user, cdtl.pwd, cdtl.sys, cdtl.folder, smsfile
+            cdtl.user, cdtl.pwd, cdtl.sys, cdtl.folder, fname
         );
         let arg = format!("lftp -c \"{}\"", arg);
 
         println!("\n{:?}\n", arg);
 
-        let output = Command::new("bash")
-            .arg("-c")
-            .arg(arg)
-            .output()
-            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
-
-        // Debug
-        println!("status: {}", output.status);
-        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
-        fs::remove_file(smsfile).unwrap();
+//        let output = Command::new("bash")
+//            .arg("-c")
+//            .arg(arg)
+//            .output()
+//            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
+//
+//        // Debug
+//        println!("status: {}", output.status);
+//        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+//        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+        fs::remove_file(fname).unwrap();
     }
 }
 
