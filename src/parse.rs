@@ -65,6 +65,10 @@ impl UserInfo {
     pub fn get_behaviors(&self) -> &Vec<Behavior> {
         &self.kind
     }
+
+    pub fn get_ips(&self) -> &Vec<String> {
+        &self.ip
+    }
 }
 
 /// Accounting of action in order to determine user behavior(Normal, Suspicious, Misbehaving)
