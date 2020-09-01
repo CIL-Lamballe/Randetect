@@ -74,15 +74,15 @@ pub mod email {
 
         // println!("{}", ssmtp);
 
-        //        let output = Command::new("bash")
-        //            .arg("-c")
-        //            .arg(ssmtp)
-        //            .output()
-        //            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
-        //
-        //        // Debug
-        //                println!("status: {}", output.status);
-        //                println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-        //                println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+        let output = Command::new("bash")
+            .arg("-c")
+            .arg(ssmtp)
+            .output()
+            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
+
+        // Debug
+        println!("status: {}", output.status);
+        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
     }
 }

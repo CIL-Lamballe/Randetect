@@ -79,15 +79,17 @@ fn main() {
                 match beh {
                     Behavior::Delete(c) if *c >= BAN_LIMIT => {
                         nas::ban(&name, info, *c);
+                        email::send(&name, info, "delete");
                         sms::send(&var, format!(
-                                "Alert NAS 🥺 user: {} banned because of deleting {} files from ip:{:?}"
+                                "Alert NAS user: {} banned because of deleting {} files from ip:{:?}"
                                 , name, *c, info.get_ips()));
                     }
                     Behavior::Suspicious(c) if *c >= BAN_LIMIT => {
                         nas::ban(&name, info, *c);
                         shutdown += 1;
+                        email::send(&name, info, "Suspicious");
                         sms::send(&var, format!(
-                                "Alert NAS 🥺 user: {} banned because of suspicious activity {} times from ip:{:?}"
+                                "Alert NAS user: {} banned because of suspicious activity {} times from ip:{:?}"
                                 , name, *c, info.get_ips()));
                     }
                     Behavior::Move(s) => {
