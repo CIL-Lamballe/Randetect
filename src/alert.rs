@@ -28,7 +28,7 @@ pub mod sms {
 
     pub fn send(cdtl: &Cdtl, text: String) {
         // write down text in a file which is the sms to be sent
-        println!("{}", text);
+        //      println!("{}", text);
         let fname = file(text);
 
         // Format the command to send sms
@@ -38,18 +38,18 @@ pub mod sms {
         );
         let arg = format!("lftp -c \"{}\"", arg);
 
-        println!("\n{:?}\n", arg);
+        //        println!("\n{:?}\n", arg);
 
-        //        let output = Command::new("bash")
-        //            .arg("-c")
-        //            .arg(arg)
-        //            .output()
-        //            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
-        //
-        //        // Debug
-        //        println!("status: {}", output.status);
-        //        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-        //        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+        let output = Command::new("bash")
+            .arg("-c")
+            .arg(arg)
+            .output()
+            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
+
+        // Debug
+        println!("status: {}", output.status);
+        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
         fs::remove_file(fname).unwrap();
     }
 }
