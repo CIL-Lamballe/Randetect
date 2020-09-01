@@ -2,8 +2,11 @@ use std::process::Command;
 use rusqlite::{params, Connection};
 use crate::parse::UserInfo;
 
+use std::time::SystemTime;
+
 fn fmt_insertban(ip: &str) -> String {
-    let epoch: &str = "1598967925"; // get time since epoch
+    let time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
+    let epoch = time.as_secs().to_string(); // get time since epoch
     format!(
         "INSERT INTO AutoBlockIP
          VALUES (
@@ -11,7 +14,7 @@ fn fmt_insertban(ip: &str) -> String {
              '{}',
              '0',
              '1',
-             '0000:0000:0000:0000:0000:FFFF:C0A8:0170',
+             '0000:0000:0000:0000:0000:0000:0000:0000',
              '0',
              '0'
              );", ip, epoch
