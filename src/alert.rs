@@ -12,7 +12,7 @@ pub mod sms {
         digits
     }
 
-    fn file(text: &str) -> String {
+    fn file(text: String) -> String {
         let now = format!("{:?}", SystemTime::now());
         //        println!("{:?}", now);
         let now = digits(&now);
@@ -26,11 +26,7 @@ pub mod sms {
         fname
     }
 
-    pub fn format(user: &str, msg: String) -> String {
-        format!("Alert NAS user: {} {}", user, msg)
-    }
-
-    pub fn send(cdtl: &Cdtl, text: &str) {
+    pub fn send(cdtl: &Cdtl, text: String) {
         // write down text in a file which is the sms to be sent
         println!("{}", text);
         let fname = file(text);
