@@ -47,12 +47,10 @@ In order to run the program, some env variables needs to be set.
 
 `FOLDER=/var/log/sms` target folder to send sms file to.
 
-`SMSUSR=SMS-TOTO` username for modem.
-
 Example:
 
 ```shell=
-CRDTL=ABCDEFGHIJ01234567 TARGETSYS=62.186.103.42 FOLDER=/var/log/sms SMSUSR=SMS-TOTO ./randetect
+CRDTL=ABCDEFGHIJ01234567 TARGETSYS=62.186.103.42 FOLDER=/var/log/sms ./randetect
 ```
 
 

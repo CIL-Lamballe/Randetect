@@ -21,7 +21,6 @@ pub struct Cdtl {
     pwd: String,
     sys: String,
     folder: String,
-    smsusr: String,
 }
 
 /// Loop delay in milliseconds
@@ -42,7 +41,6 @@ fn env_variables() -> Cdtl {
         pwd: crdtl[10..18].to_string(),
         sys: getenv("TARGETSYS"),
         folder: getenv("FOLDER"),
-        smsusr: getenv("SMSUSR"),
     }
 }
 
@@ -80,7 +78,7 @@ fn main() {
                     Behavior::Suspicious(c) if *c >= BAN_LIMIT => {
                         nas::ban(&name, info, *c);
                         shutdown += 1;
-                        sms::send(&var, "Hello this is a sms");
+                        sms::send(&var, &sms::format(&name, format!("banned because of suspicious activity {} times ip:{:?}", *c, info.get_ips())));
                     }
                     Behavior::Move(s) => {
                         email::send(&name, info, "Move");
