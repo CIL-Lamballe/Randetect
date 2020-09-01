@@ -1,5 +1,5 @@
 pub mod sms {
-    use crate::{parse::UserInfo, Cdtl};
+    use crate::Cdtl;
     use std::{fs, fs::File, io::Write, process::Command, time::SystemTime};
 
     fn digits(s: &str) -> String {
