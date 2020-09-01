@@ -1,6 +1,7 @@
 mod alert;
 mod parse;
 mod query;
+mod nas;
 
 use alert::{email, sms};
 use parse::Behavior;
@@ -8,8 +9,11 @@ use query::Type;
 use rusqlite::Connection;
 use std::{collections::HashMap, env, thread, time::Duration};
 
+/// Path to file log db
 const DB: &str = "/var/log/synolog/.SMBXFERDB";
-//const DB: &str = "/home/antoine/RanDetect/.SMBXFERDB";
+
+/// Maximum of suspicious actions
+const BAN_LIMIT: i32 = 50;
 
 pub struct Cdtl {
     user: String,
@@ -47,7 +51,7 @@ fn main() {
     let duration = Duration::from_millis(TIME);
 
     let conn = match Connection::open(DB) {
-        Err(conn) => panic!("Could not reach/open database {}", DB),
+        Err(conn) => panic!("Could not reach/open database {} {}", DB, conn),
         Ok(conn) => conn,
     };
     let mut id = query::updated_id(&conn);// - 2_500;
@@ -65,20 +69,17 @@ fn main() {
             let (name, info) = user;
             for beh in info.get_behaviors() {
                 match beh {
-                    Behavior::Delete(c) if *c >= 50 => {
-                        println!(
-                            "BAN of {} because he/she as been deleting {} files",
-                            name, *c
-                        );
-                        //email::send(&name, info, "Move");
+                    Behavior::Delete(c) if *c >= BAN_LIMIT => {
+                        nas::ban(&name, info, *c);
+                        email::send(&name, info, "Delete");
                     }
-                    Behavior::Suspicious(c) if *c >= 50 => {
+                    Behavior::Suspicious(c) if *c >= BAN_LIMIT => {
                         println!("BAN of {} for having suspicious activity", name);
-                        //sms::send(&var, &name, info);
+                        sms::send(&var, &name, info);
                     }
                     Behavior::Move(s) => {
                         println!("{} moved the folder {}", name, *s);
-                        //email::send(&name, info, "Move");
+                        email::send(&name, info, "Move");
                     }
                     _ => (),
                 }

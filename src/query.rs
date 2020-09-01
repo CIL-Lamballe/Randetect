@@ -1,4 +1,4 @@
-use rusqlite::{params, Connection, Result, NO_PARAMS};
+use rusqlite::{params, Connection, Result};
 
 fn fmt_qdelete(id: i32, period: i32) -> String {
     // period 100
@@ -180,7 +180,7 @@ impl Log {
     pub fn get_dir(&self) -> String {
         match &self.dir {
             Ok(f) => String::from(f),
-            Err(e) => String::from("empty"),
+            Err(_e) => String::from("empty"),
         }
     }
 
@@ -219,7 +219,7 @@ pub fn select(conn: &Connection, qtype: Type, id: &i32) -> Vec<Log> {
         //      println!("here: {:?}", each);
         match each {
             Ok(t) => relation.push(t),
-            Err(e) => (),
+            Err(_e) => (),
         }
     }
     relation
