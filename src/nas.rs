@@ -57,12 +57,12 @@ pub fn ban(info: &UserInfo) {
         let (_status, stdout, _stderr) = cmd_exec(&cmd);
         thread::sleep(Duration::from_millis(500));
         let v: Value = serde_json::from_str(&stdout).unwrap();
-        println!("{:?}", v);
-        //        let v = v.data["task_id"];
-  //      println!("task_id: {}", v);
+        let v: Value = serde_json::from_str(&v["data"].to_string()).unwrap();
+        let v = v["task_id"].to_string();
+        println!("\n==\ntask_id: {}\n==\n", v);
 
         // Update the profile using task_id
-        let cmd = update_profile(&v.to_string());
+        let cmd = update_profile(&v);
         cmd_exec(&cmd);
         thread::sleep(Duration::from_millis(500));
 
