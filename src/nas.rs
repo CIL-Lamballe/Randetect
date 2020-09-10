@@ -50,26 +50,25 @@ pub fn ban(info: &UserInfo) {
         // Format ban request
         let cmd = ban_profile(&ip);
         cmd_exec(&cmd);
-        thread::sleep(Duration::from_millis(500));
+        thread::sleep(Duration::from_millis(800));
 
         // Apply new profile and request task_id
         let cmd = apply_profile();
         let (_status, stdout, _stderr) = cmd_exec(&cmd);
-        thread::sleep(Duration::from_millis(500));
+        thread::sleep(Duration::from_millis(800));
         let v: Value = serde_json::from_str(&stdout).unwrap();
         let v: Value = serde_json::from_str(&v["data"].to_string()).unwrap();
         let v = v["task_id"].to_string();
-        println!("\n==\ntask_id: {}\n==\n", v);
 
         // Update the profile using task_id
         let cmd = update_profile(&v);
         cmd_exec(&cmd);
-        thread::sleep(Duration::from_millis(500));
+        thread::sleep(Duration::from_millis(800));
 
         // Finalize the request
         let cmd = close_request();
         cmd_exec(&cmd);
-        thread::sleep(Duration::from_millis(500));
+        thread::sleep(Duration::from_millis(800));
 
         // Restart Samba to kick off user
         cmd_exec("/sbin/restart smbd");
