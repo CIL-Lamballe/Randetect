@@ -1,39 +1,28 @@
 use crate::parse::UserInfo;
-use rusqlite::{params, Connection};
-use std::{process::Command, time::SystemTime};
+use std::process::Command;
 
-const AUTOBLOCK: &str = "/etc/synoautoblock.db";
-
-fn fmt_insertban(ip: &str) -> String {
-    let time = SystemTime::now()
-        .duration_since(SystemTime::UNIX_EPOCH)
-        .unwrap();
-    let epoch = time.as_secs().to_string(); // get time since epoch
-    format!(
-        "INSERT INTO AutoBlockIP
-         VALUES (
-             '{}',
-             '{}',
-             '0',
-             '1',
-             '0000:0000:0000:0000:0000:0000:0000:0000',
-             '0',
-             '0'
-             );",
-        ip, epoch
-    )
+fn set_ban_profile(ip: &str) -> String {
+    "synowebapi --exec".to_string()
+    + " profile=\\{\\\"global\\\":\\{\\\"policy\\\":\\\"none\\\",\\\"rules\\\":\\[\\{\\\"enable\\\":true,\\\"name\\\":\\\"\\\",\\\"port_direction\\\":\\\"\\\",\\\"port_group\\\":\\\"all\\\",\\\"ports\\\":\\\"all\\\",\\\"protocol\\\":\\\"all\\\",\\\"source_ip_group\\\":\\\"ip\\\",\\\"source_ip\\\":\\\""
+    + ip
+    + "\\\",\\\"policy\\\":\\\"drop\\\",\\\"log\\\":false\\}\\]\\},\\\"name\\\":\\\"custom\\\"\\}"
+    + " profile_applying=true api=SYNO.Core.Security.Firewall.Profile method=set version=1"
 }
 
 pub fn ban(info: &UserInfo) {
-    let conn = match Connection::open(AUTOBLOCK) {
-        Err(conn) => panic!("Could not reach/open database {} {}", AUTOBLOCK, conn),
-        Ok(conn) => conn,
-    };
-
     for ip in info.get_ips().iter() {
-        let insertstmt = fmt_insertban(&ip);
-        //println!("{}", &insertstmt);
-        conn.execute(&insertstmt, params![]).unwrap();
+        let cmd = set_ban_profile(&ip);
+        println!("{}", cmd);
+        //        let output = Command::new("bash")
+        //            .arg("-c")
+        //            .arg("shutdown -h now")
+        //            .output()
+        //            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
+
+        // Debug should send sms failed to poweroff and send when powering off
+        //        println!("status: {}", output.status);
+        //        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        //        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
     }
 }
 
