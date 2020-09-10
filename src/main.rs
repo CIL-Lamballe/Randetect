@@ -8,10 +8,11 @@ use parse::Behavior;
 use query::Type;
 use rusqlite::Connection;
 use std::{collections::HashMap, env, thread, time::Duration};
+extern crate sys_info;
 
 macro_rules! nas_shutdown {
     () => {
-        String::from("Alert NAS shutdown ! Because of too many suspicious activities !")
+        String::from(format!("Alert NAS {} shutdown ! Because of too many suspicious activities !", sys_info::hostname().unwrap()))
     };
 }
 
@@ -79,16 +80,16 @@ fn main() {
                         nas::ban(info);
                         email::send(&name, info, "delete");
                         sms::send(&var, format!(
-                                "Alert NAS user: {} banned because of deleting {} files from ip:{:?}"
-                                , name, *c, info.get_ips()));
+                                "Alert NAS {} user: {} banned because of deleting {} files from ip:{:?}"
+                                , sys_info::hostname().unwrap(), name, *c, info.get_ips()));
                     }
                     Behavior::Suspicious(c) if *c >= BAN_LIMIT => {
                         nas::ban(info);
                         shutdown += 1;
                         email::send(&name, info, "Suspicious");
                         sms::send(&var, format!(
-                                "Alert NAS user: {} banned because of suspicious activity {} times from ip:{:?}"
-                                , name, *c, info.get_ips()));
+                                "Alert NAS {} user: {} banned because of suspicious activity {} times from ip:{:?}"
+                                , sys_info::hostname().unwrap(), name, *c, info.get_ips()));
                     }
                     Behavior::Move(_s) => {
                         email::send(&name, info, "Move");
