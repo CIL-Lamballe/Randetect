@@ -1,6 +1,6 @@
 pub mod sms {
-    use crate::Cdtl;
-    use std::{fs, fs::File, io::Write, process::Command, time::SystemTime};
+    use crate::{nas, Cdtl};
+    use std::{fs, fs::File, io::Write, time::SystemTime};
 
     fn digits(s: &str) -> String {
         let mut digits = String::new();
@@ -37,26 +37,14 @@ pub mod sms {
             cdtl.user, cdtl.pwd, cdtl.sys, cdtl.folder, fname
         );
         let arg = format!("lftp -c \"{}\"", arg);
-
         //        println!("\n{:?}\n", arg);
-
-        let output = Command::new("bash")
-            .arg("-c")
-            .arg(arg)
-            .output()
-            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
-
-        // Debug
-        println!("status: {}", output.status);
-        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+        nas::cmd_exec(&arg);
         fs::remove_file(fname).unwrap();
     }
 }
 
 pub mod email {
-    use crate::parse::UserInfo;
-    use std::process::Command;
+    use crate::{nas, parse::UserInfo};
 
     const TO: &str = "a.barthelemy@cil-lamballe.com";
 
@@ -71,18 +59,7 @@ pub mod email {
                     format!("{} performed {}\nDetail:\n{:?}", user, act, info)
                 )
             );
-
         // println!("{}", ssmtp);
-
-        let output = Command::new("bash")
-            .arg("-c")
-            .arg(ssmtp)
-            .output()
-            .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
-
-        // Debug
-        println!("status: {}", output.status);
-        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-        println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+        nas::cmd_exec(&ssmtp);
     }
 }
