@@ -34,17 +34,42 @@ fn apply_profile() -> String {
     "synowebapi --exec name=\"custom\" profile_applying=true api=SYNO.Core.Security.Firewall.Profile.Apply method=start version=1".to_string()
 }
 
+fn update_profile(task_id: &str) -> String {
+    "synowebapi --exec task_id=".to_string()
+    + task_id
+    + "api=SYNO.Core.Security.Firewall.Profile.Apply method=status version=1"
+}
+
+fn close_request() -> String {
+    "synowebapi --exec api=SYNO.Core.Security.Firewall.Profile.Apply method=stop version=1".to_string()
+}
+
 pub fn ban(info: &UserInfo) {
     for ip in info.get_ips().iter() {
+        // Format ban request
         let cmd = ban_profile(&ip);
         cmd_exec(&cmd);
         thread::sleep(Duration::from_millis(500));
+
+        // Apply new profile and request task_id
         let cmd = apply_profile();
         let (status, stdout, stderr) = cmd_exec(&cmd);
         thread::sleep(Duration::from_millis(500));
         let v: Value = serde_json::from_str(&stdout).unwrap();
         println!("task_id: {}", v["task_id"]);
 
+        // Update the profile using task_id
+        let cmd = update_profile(&v["task_id"].to_string());
+        cmd_exec(&cmd);
+        thread::sleep(Duration::from_millis(500));
+
+        // Finalize the request
+        let cmd = close_request();
+        cmd_exec(&cmd);
+        thread::sleep(Duration::from_millis(500));
+
+        // Restart Samba to kick off user
+        cmd_exec("/sbin/restart smbd");
     }
 }
 
