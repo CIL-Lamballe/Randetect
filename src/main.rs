@@ -12,7 +12,10 @@ extern crate sys_info;
 
 macro_rules! nas_shutdown {
     () => {
-        String::from(format!("Alert NAS {} shutdown ! Because of too many suspicious activities !", sys_info::hostname().unwrap()))
+        String::from(format!(
+            "Alert NAS {} shutdown ! Because of too many suspicious activities !",
+            sys_info::hostname().unwrap()
+        ))
     };
 }
 

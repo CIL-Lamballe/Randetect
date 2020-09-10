@@ -1,7 +1,6 @@
 use crate::parse::UserInfo;
 use serde_json::Value;
-use std::process::Command;
-//use std::{process::Command, thread, time::Duration};
+use std::{process::Command, thread, time::Duration};
 
 pub fn cmd_exec(cmd: &str) -> (String, String, String) {
     println!("{}", cmd);
@@ -47,16 +46,16 @@ fn close_request() -> String {
 }
 
 pub fn ban(info: &UserInfo) {
-    for ip in info.get_ips().iter() {
+    {
+        // Quick Ban
+        for ip in info.get_ips().iter() {
             // Format ban request
             let cmd = ban_profile(&ip);
             cmd_exec(&cmd);
-            // thread::sleep(Duration::from_millis(400));
 
             // Apply new profile and request task_id
             let cmd = apply_profile();
             let (_status, stdout, _stderr) = cmd_exec(&cmd);
-            //  thread::sleep(Duration::from_millis(400));
             let v: Value = serde_json::from_str(&stdout).unwrap();
             let v: Value = serde_json::from_str(&v["data"].to_string()).unwrap();
             let v = v["task_id"].to_string();
@@ -64,15 +63,36 @@ pub fn ban(info: &UserInfo) {
             // Update the profile using task_id
             let cmd = update_profile(&v);
             cmd_exec(&cmd);
-            //  thread::sleep(Duration::from_millis(400));
 
             // Finalize the request
             let cmd = close_request();
             cmd_exec(&cmd);
-            //  thread::sleep(Duration::from_millis(400));
 
             // Restart Samba to kick off user
             cmd_exec("/sbin/restart smbd");
+        }
+    }
+
+    {
+        // Slow redo for webclient to capture it
+        for ip in info.get_ips().iter() {
+            let cmd = ban_profile(&ip);
+            cmd_exec(&cmd);
+            thread::sleep(Duration::from_millis(1_000));
+            let cmd = apply_profile();
+            let (_status, stdout, _stderr) = cmd_exec(&cmd);
+            thread::sleep(Duration::from_millis(1_000));
+            let v: Value = serde_json::from_str(&stdout).unwrap();
+            let v: Value = serde_json::from_str(&v["data"].to_string()).unwrap();
+            let v = v["task_id"].to_string();
+            let cmd = update_profile(&v);
+            cmd_exec(&cmd);
+            thread::sleep(Duration::from_millis(1_000));
+            let cmd = close_request();
+            cmd_exec(&cmd);
+            thread::sleep(Duration::from_millis(1_000));
+            cmd_exec("/sbin/restart smbd");
+        }
     }
 }
 
