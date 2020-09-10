@@ -48,7 +48,6 @@ fn close_request() -> String {
 
 pub fn ban(info: &UserInfo) {
     for ip in info.get_ips().iter() {
-        for _retry in 0..2 {
             // Format ban request
             let cmd = ban_profile(&ip);
             cmd_exec(&cmd);
@@ -74,7 +73,6 @@ pub fn ban(info: &UserInfo) {
 
             // Restart Samba to kick off user
             cmd_exec("/sbin/restart smbd");
-        }
     }
 }
 
