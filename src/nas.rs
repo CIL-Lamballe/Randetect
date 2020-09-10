@@ -22,6 +22,19 @@ pub fn cmd_exec(cmd: &str) -> (String, String, String) {
     )
 }
 
+pub fn enable_firewall() {
+    let (_status, stdout, _stderr) = cmd_exec("synowebapi --exec name=\"custom\" profile_applying=false api=SYNO.Core.Security.Firewall.Profile.Apply method=start version=1");
+    let v: Value = serde_json::from_str(&stdout).unwrap();
+    let v: Value = serde_json::from_str(&v["data"].to_string()).unwrap();
+    let v = v["task_id"].to_string();
+    thread::sleep(Duration::from_millis(1_000));
+    cmd_exec(&format!("synowebapi --exec api=SYNO.Core.Security.Firewall.Profile.Apply method=status version=1 task_id={}", v));
+    thread::sleep(Duration::from_millis(1_000));
+    cmd_exec(
+        "synowebapi --exec api=SYNO.Core.Security.Firewall.Profile.Apply method=stop version=1",
+    );
+}
+
 fn ban_profile(ip: &str) -> String {
     "synowebapi --exec".to_string()
         + " profile=\\{\\\"global\\\":\\{\\\"policy\\\":\\\"none\\\",\\\"rules\\\":\\[\\{\\\"enable\\\":true,\\\"name\\\":\\\"\\\",\\\"port_direction\\\":\\\"\\\",\\\"port_group\\\":\\\"all\\\",\\\"ports\\\":\\\"all\\\",\\\"protocol\\\":\\\"all\\\",\\\"source_ip_group\\\":\\\"ip\\\",\\\"source_ip\\\":\\\""
