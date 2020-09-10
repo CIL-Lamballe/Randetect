@@ -1,6 +1,6 @@
 use crate::parse::UserInfo;
+use serde_json::Value;
 use std::{process::Command, thread, time::Duration};
-use serde_json::{Result, Value};
 
 pub fn cmd_exec(cmd: &str) -> (String, String, String) {
     println!("{}", cmd);
@@ -36,12 +36,13 @@ fn apply_profile() -> String {
 
 fn update_profile(task_id: &str) -> String {
     "synowebapi --exec task_id=".to_string()
-    + task_id
-    + "api=SYNO.Core.Security.Firewall.Profile.Apply method=status version=1"
+        + task_id
+        + "api=SYNO.Core.Security.Firewall.Profile.Apply method=status version=1"
 }
 
 fn close_request() -> String {
-    "synowebapi --exec api=SYNO.Core.Security.Firewall.Profile.Apply method=stop version=1".to_string()
+    "synowebapi --exec api=SYNO.Core.Security.Firewall.Profile.Apply method=stop version=1"
+        .to_string()
 }
 
 pub fn ban(info: &UserInfo) {
@@ -53,7 +54,7 @@ pub fn ban(info: &UserInfo) {
 
         // Apply new profile and request task_id
         let cmd = apply_profile();
-        let (status, stdout, stderr) = cmd_exec(&cmd);
+        let (_status, stdout, _stderr) = cmd_exec(&cmd);
         thread::sleep(Duration::from_millis(500));
         let v: Value = serde_json::from_str(&stdout).unwrap();
         println!("task_id: {}", v["task_id"]);
