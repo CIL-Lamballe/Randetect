@@ -55,6 +55,8 @@ fn env_variables() -> Cdtl {
 fn main() {
     let var: Cdtl = env_variables();
 
+    nas::enable_firewall();
+
     let duration = Duration::from_millis(TIME);
 
     let conn = match Connection::open(DB) {
