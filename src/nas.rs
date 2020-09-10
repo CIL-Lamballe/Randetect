@@ -37,7 +37,7 @@ fn apply_profile() -> String {
 fn update_profile(task_id: &str) -> String {
     "synowebapi --exec task_id=".to_string()
         + task_id
-        + "api=SYNO.Core.Security.Firewall.Profile.Apply method=status version=1"
+        + " api=SYNO.Core.Security.Firewall.Profile.Apply method=status version=1"
 }
 
 fn close_request() -> String {
@@ -57,10 +57,12 @@ pub fn ban(info: &UserInfo) {
         let (_status, stdout, _stderr) = cmd_exec(&cmd);
         thread::sleep(Duration::from_millis(500));
         let v: Value = serde_json::from_str(&stdout).unwrap();
-        println!("task_id: {}", v["task_id"]);
+        println!("{:?}", v);
+        //        let v = v.data["task_id"];
+  //      println!("task_id: {}", v);
 
         // Update the profile using task_id
-        let cmd = update_profile(&v["task_id"].to_string());
+        let cmd = update_profile(&v.to_string());
         cmd_exec(&cmd);
         thread::sleep(Duration::from_millis(500));
 
