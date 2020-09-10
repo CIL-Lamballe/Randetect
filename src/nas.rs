@@ -1,6 +1,6 @@
 use crate::parse::UserInfo;
-use std::{thread, process::Command, time::Duration};
-
+use std::{process::Command, thread, time::Duration};
+use serde_json::{Result, Value};
 
 pub fn cmd_exec(cmd: &str) -> (String, String, String) {
     println!("{}", cmd);
@@ -10,15 +10,16 @@ pub fn cmd_exec(cmd: &str) -> (String, String, String) {
         .output()
         .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
 
-
     // Debug
     println!("status: {}", output.status);
     println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
     println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
 
-    (format!("{}", output.status),
+    (
+        format!("{}", output.status),
         format!("{}", String::from_utf8_lossy(&output.stdout)),
-            format!("{}", String::from_utf8_lossy(&output.stderr)))
+        format!("{}", String::from_utf8_lossy(&output.stderr)),
+    )
 }
 
 fn ban_profile(ip: &str) -> String {
@@ -41,6 +42,9 @@ pub fn ban(info: &UserInfo) {
         let cmd = apply_profile();
         let (status, stdout, stderr) = cmd_exec(&cmd);
         thread::sleep(Duration::from_millis(500));
+        let v: Value = serde_json::from_str(&stdout).unwrap();
+        println!("task_id: {}", v["task_id"]);
+
     }
 }
 
