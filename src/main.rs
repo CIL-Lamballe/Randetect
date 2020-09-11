@@ -56,19 +56,19 @@ fn env_variables() -> Cdtl {
 }
 
 fn daemonize() {
-    let stdout = File::create("/var/log/randetect.out").unwrap();
-    let stderr = File::create("/var/log/randetect.err").unwrap();
+    let stdout = File::create("/tmp/randetect.out").unwrap();
+    let stderr = File::create("/tmp/log/randetect.err").unwrap();
 
     let daemonize = Daemonize::new()
-        .pid_file("/run/randetect.pid") // Every method except `new` and `start`
-        .chown_pid_file(true)      // is optional, see `Daemonize` documentation
-        .working_directory("/tmp") // for default behaviour.
+        .pid_file("/run/randetect.pid")
+        .chown_pid_file(true)
+        .working_directory("/tmp")
         .user("nobody")
-        .group("daemon") // Group name
-        .group(2)        // or group id.
-        .umask(0o027)    // Set umask, `0o027` by default.
-        .stdout(stdout)  // Redirect stdout to `/tmp/daemon.out`.
-        .stderr(stderr)  // Redirect stderr to `/tmp/daemon.err`.
+        .group("daemon")
+        .group(2)
+        .umask(0o027)
+        .stdout(stdout)
+        .stderr(stderr)
         .privileged_action(|| "Executed before drop privileges");
 
     match daemonize.start() {
