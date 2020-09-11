@@ -55,7 +55,7 @@ fn env_variables() -> Cdtl {
     }
 }
 
-fn launch_daemon() {
+fn daemonize() {
     let stdout = File::create("/var/log/randetect.out").unwrap();
     let stderr = File::create("/var/log/randetect.err").unwrap();
 
@@ -78,7 +78,7 @@ fn launch_daemon() {
 }
 
 fn main() {
-    launch_daemon();
+    daemonize();
 
     let var: Cdtl = env_variables();
 
