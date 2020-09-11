@@ -63,7 +63,7 @@ fn daemonize() {
         .pid_file("/run/randetect.pid")
         .chown_pid_file(true)
         .working_directory("/tmp")
-        .user("nobody")
+        .user("root")
         .group("daemon")
         .group(2)
         .umask(0o027)
