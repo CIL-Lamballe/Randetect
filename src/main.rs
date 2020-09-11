@@ -3,12 +3,15 @@ mod nas;
 mod parse;
 mod query;
 
+extern crate sys_info;
+extern crate daemonize;
+
 use alert::{email, sms};
 use parse::Behavior;
 use query::Type;
 use rusqlite::Connection;
-use std::{collections::HashMap, env, thread, time::Duration};
-extern crate sys_info;
+use std::{collections::HashMap, fs::File, process, env, thread, time::Duration};
+use daemonize::Daemonize;
 
 macro_rules! nas_shutdown {
     () => {
@@ -52,7 +55,31 @@ fn env_variables() -> Cdtl {
     }
 }
 
+fn daemonize() {
+    let stdout = File::create("/tmp/randetect.out").unwrap();
+    let stderr = File::create("/tmp/randetect.err").unwrap();
+
+    let daemonize = Daemonize::new()
+        .pid_file("/run/randetect.pid")
+        .chown_pid_file(true)
+        .working_directory("/tmp")
+        .user("root")
+        .group("daemon")
+        .group(2)
+        .umask(0o077)
+        .stdout(stdout)
+        .stderr(stderr)
+        .privileged_action(|| "Executed before drop privileges");
+
+    match daemonize.start() {
+        Ok(_) => println!("Success, daemonized"),
+        Err(e) => { eprintln!("Error, {}", e); process::exit(1) },
+    }
+}
+
 fn main() {
+    daemonize();
+
     let var: Cdtl = env_variables();
 
     nas::enable_firewall();
