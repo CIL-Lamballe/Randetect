@@ -16,9 +16,9 @@ daemon_NAME="randetect"
 
 PATH="/sbin:/bin:/usr/sbin:/usr/bin"
 
-test -x $DAEMON || exit 0
+#test -x $DAEMON || exit 0
 
-. /lib/lsb/init-functions
+#. /lib/lsb/init-functions
 
 d_start () {
 	log_daemon_msg "Starting system $daemon_NAME Daemon"
@@ -51,10 +51,10 @@ case "$1" in
 		;;
 
 	status)
-		status_of_proc "$daemon_NAME" "$DAEMON" "system-wide $daemon_NAME" && exit 0 || exit $?
+		status "$daemon_NAME" "$DAEMON" "system-wide $daemon_NAME" && exit 0 || exit $?
 		;;
 	*)
-		echo "Usage: /etc/init.d/$daemon_NAME {start|stop|force-stop|restart|reload|force-reload|status}"
+		echo "Usage: /etc/init/$daemon_NAME {start|stop|force-stop|restart|reload|force-reload|status}"
 		exit 1
 		;;
 esac
