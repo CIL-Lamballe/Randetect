@@ -66,7 +66,7 @@ fn daemonize() {
         .user("root")
         .group("daemon")
         .group(2)
-        .umask(0o777)
+        .umask(0o077)
         .stdout(stdout)
         .stderr(stderr)
         .privileged_action(|| "Executed before drop privileges");
