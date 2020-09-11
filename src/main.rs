@@ -57,7 +57,7 @@ fn env_variables() -> Cdtl {
 
 fn daemonize() {
     let stdout = File::create("/tmp/randetect.out").unwrap();
-    let stderr = File::create("/tmp/log/randetect.err").unwrap();
+    let stderr = File::create("/tmp/randetect.err").unwrap();
 
     let daemonize = Daemonize::new()
         .pid_file("/run/randetect.pid")
