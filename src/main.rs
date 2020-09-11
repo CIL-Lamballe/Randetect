@@ -3,12 +3,15 @@ mod nas;
 mod parse;
 mod query;
 
+extern crate sys_info;
+extern crate daemonize;
+
 use alert::{email, sms};
 use parse::Behavior;
 use query::Type;
 use rusqlite::Connection;
-use std::{collections::HashMap, env, thread, time::Duration};
-extern crate sys_info;
+use std::{collections::HashMap, fs::File, process, env, thread, time::Duration};
+use daemonize::Daemonize;
 
 macro_rules! nas_shutdown {
     () => {
@@ -52,7 +55,31 @@ fn env_variables() -> Cdtl {
     }
 }
 
+fn launch_daemon() {
+    let stdout = File::create("/var/log/randetect.out").unwrap();
+    let stderr = File::create("/var/log/randetect.err").unwrap();
+
+    let daemonize = Daemonize::new()
+        .pid_file("/run/randetect.pid") // Every method except `new` and `start`
+        .chown_pid_file(true)      // is optional, see `Daemonize` documentation
+        .working_directory("/tmp") // for default behaviour.
+        .user("nobody")
+        .group("daemon") // Group name
+        .group(2)        // or group id.
+        .umask(0o027)    // Set umask, `0o027` by default.
+        .stdout(stdout)  // Redirect stdout to `/tmp/daemon.out`.
+        .stderr(stderr)  // Redirect stderr to `/tmp/daemon.err`.
+        .privileged_action(|| "Executed before drop privileges");
+
+    match daemonize.start() {
+        Ok(_) => println!("Success, daemonized"),
+        Err(e) => { eprintln!("Error, {}", e); process::exit(1) },
+    }
+}
+
 fn main() {
+    launch_daemon();
+
     let var: Cdtl = env_variables();
 
     nas::enable_firewall();
