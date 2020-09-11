@@ -10,7 +10,7 @@
 ### END INIT INFO
 
 DAEMON="/bin/randetect"
-#daemon_OPT="-d -p -f /home/user/SABnzbd/sabnzbd.ini"
+#daemon_OPT="-d -p -f /home/user/randetect.ini"
 DAEMONUSER="nobody"
 daemon_NAME="randetect"
 
