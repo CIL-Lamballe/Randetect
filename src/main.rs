@@ -3,15 +3,15 @@ mod nas;
 mod parse;
 mod query;
 
-extern crate sys_info;
 extern crate daemonize;
+extern crate sys_info;
 
 use alert::{email, sms};
+use daemonize::Daemonize;
 use parse::Behavior;
 use query::Type;
 use rusqlite::Connection;
-use std::{collections::HashMap, fs::File, process, env, thread, time::Duration};
-use daemonize::Daemonize;
+use std::{collections::HashMap, env, fs::File, process, thread, time::Duration};
 
 macro_rules! nas_shutdown {
     () => {
@@ -75,7 +75,10 @@ fn daemonize() {
 
     match daemonize.start() {
         Ok(_) => println!("Success, daemonized"),
-        Err(e) => { eprintln!("Error, {}", e); process::exit(1) },
+        Err(e) => {
+            eprintln!("Error, {}", e);
+            process::exit(1)
+        }
     }
 }
 

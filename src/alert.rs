@@ -44,7 +44,7 @@ pub mod sms {
 }
 
 pub mod email {
-    use crate::{nas, Cdtl, parse::UserInfo};
+    use crate::{nas, parse::UserInfo, Cdtl};
 
     pub fn send(cdtl: &Cdtl, user: &str, info: &UserInfo, act: &str) {
         let ssmtp = "ssmtp ".to_string()
