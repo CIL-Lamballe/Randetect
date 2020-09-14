@@ -14,7 +14,7 @@
     <img src="assets/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">Randetect</h3>
+  <h1 align="center">Randetect</h1>
 
   <p align="center">
     A user suspicious activity detector for Synology NAS.
