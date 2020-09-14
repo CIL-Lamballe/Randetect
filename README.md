@@ -47,10 +47,12 @@ In order to run the program, some env variables needs to be set.
 
 `FOLDER=/var/log/sms` target folder to send sms file to.
 
+`MAILTO=addr@domain.com` mail target for mail alert.
+
 Example:
 
 ```shell=
-CRDTL=ABCDEFGHIJ01234567 TARGETSYS=62.186.103.42 FOLDER=/var/log/sms ./randetect
+CRDTL=ABCDEFGHIJ01234567 TARGETSYS=62.186.103.42 FOLDER=/var/log/sms MAILTO="martin@gmail.com" ./randetect
 ```
 
 

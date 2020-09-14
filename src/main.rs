@@ -32,6 +32,7 @@ pub struct Cdtl {
     pwd: String,
     sys: String,
     folder: String,
+    mailto: String,
 }
 
 /// Loop delay in milliseconds
@@ -52,6 +53,7 @@ fn env_variables() -> Cdtl {
         pwd: crdtl[10..18].to_string(),
         sys: getenv("TARGETSYS"),
         folder: getenv("FOLDER"),
+        mailto: getenv("MAILTO"),
     }
 }
 
@@ -110,7 +112,7 @@ fn main() {
                 match beh {
                     Behavior::Delete(c) if *c >= BAN_LIMIT => {
                         nas::ban(info);
-                        email::send(&name, info, "delete");
+                        email::send(&var, &name, info, "delete");
                         sms::send(&var, format!(
                                 "Alert NAS {} user: {} banned because of deleting {} files from ip:{:?}"
                                 , sys_info::hostname().unwrap(), name, *c, info.get_ips()));
@@ -118,13 +120,13 @@ fn main() {
                     Behavior::Suspicious(c) if *c >= BAN_LIMIT => {
                         nas::ban(info);
                         shutdown += 1;
-                        email::send(&name, info, "Suspicious");
+                        email::send(&var, &name, info, "Suspicious");
                         sms::send(&var, format!(
                                 "Alert NAS {} user: {} banned because of suspicious activity {} times from ip:{:?}"
                                 , sys_info::hostname().unwrap(), name, *c, info.get_ips()));
                     }
                     Behavior::Move(_s) => {
-                        email::send(&name, info, "Move");
+                        email::send(&var, &name, info, "Move");
                     }
                     _ => (),
                 }

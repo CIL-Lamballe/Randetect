@@ -44,13 +44,11 @@ pub mod sms {
 }
 
 pub mod email {
-    use crate::{nas, parse::UserInfo};
+    use crate::{nas, Cdtl, parse::UserInfo};
 
-    const TO: &str = "a.barthelemy@cil-lamballe.com";
-
-    pub fn send(user: &str, info: &UserInfo, act: &str) {
+    pub fn send(cdtl: &Cdtl, user: &str, info: &UserInfo, act: &str) {
         let ssmtp = "ssmtp ".to_string()
-            + TO
+            + &cdtl.mailto
             + &format!(
                 " <<< \"{}\"",
                 format!(
