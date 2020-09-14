@@ -1,7 +1,7 @@
 [package]
 name = "randetect"
-version = "0.1.0"
-authors = ["Antoine Barthelemy <abarthel@student.42.fr>"]
+version = "1.0.0"
+authors = ["CIL Lamballe<contact@cil-lamballe.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
