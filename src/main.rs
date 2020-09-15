@@ -25,7 +25,7 @@ macro_rules! nas_shutdown {
 const DB: &str = "/var/log/synolog/.SMBXFERDB";
 
 /// Maximum of suspicious actions
-const BAN_LIMIT: i32 = 50;
+const BAN_LIMIT: i32 = 30;
 
 pub struct Cdtl {
     user: String,
@@ -36,7 +36,7 @@ pub struct Cdtl {
 }
 
 /// Loop delay in milliseconds
-const TIME: u64 = 2_000;
+const TIME: u64 = 800;
 
 /// Get environment variable for lftp use
 fn getenv(var: &str) -> String {
@@ -109,6 +109,7 @@ fn main() {
         parse::log(query, &mut list);
 
         let mut shutdown = 0;
+
         for user in list.iter() {
             let (name, info) = user;
             for beh in info.get_behaviors() {

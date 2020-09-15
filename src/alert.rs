@@ -50,7 +50,7 @@ pub mod email {
         let ssmtp = "ssmtp ".to_string()
             + &cdtl.mailto
             + &format!(
-                " <<< \"{}\"",
+                " <<< \'{}\'",
                 format!(
                     "Subject: {}\n{}\n",
                     format!("{} - {}", user, act),

@@ -188,9 +188,9 @@ impl Log {
 pub fn select(conn: &Connection, qtype: Type, id: &i32) -> Vec<Log> {
     let mut stmt = {
         match qtype {
-            Type::Delete => conn.prepare(&fmt_qdelete(*id, 100)).unwrap(),
-            Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(*id, 3)).unwrap(),
-            Type::SuspiciousCrwd => conn.prepare(&fmt_qsuspiciouscrwd(*id, 3)).unwrap(),
+            Type::Delete => conn.prepare(&fmt_qdelete(*id, 10)).unwrap(),
+            Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(*id, 5)).unwrap(),
+            Type::SuspiciousCrwd => conn.prepare(&fmt_qsuspiciouscrwd(*id, 5)).unwrap(),
             Type::Move => conn.prepare(&fmt_qmove(*id)).unwrap(),
         }
     };
