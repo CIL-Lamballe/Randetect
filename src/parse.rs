@@ -29,7 +29,6 @@ impl UserInfo {
                 k.push(match t {
                     Type::Delete => Behavior::Delete(1),
                     Type::SuspiciousCwd => Behavior::Suspicious(1),
-                    Type::SuspiciousCrwd => Behavior::Suspicious(1),
                     Type::Move => Behavior::Move(dir),
                 });
                 k
@@ -47,7 +46,7 @@ impl UserInfo {
                     };
                 }
             }
-            Type::SuspiciousCwd | Type::SuspiciousCrwd => {
+            Type::SuspiciousCwd => {
                 for each in &mut self.kind {
                     match each {
                         Behavior::Suspicious(c) => *c = *c + 1,

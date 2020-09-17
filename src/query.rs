@@ -26,12 +26,12 @@ fn fmt_qsuspiciouscwd(id: i32, period: i32) -> String {
      (
       SELECT    *
       FROM    logs
-      WHERE    id > {} AND isdir = 0
+      WHERE    id > {} AND time > strftime('%s', 'now') - 5 * 60 AND isdir = 0
      ) A,
      (
       SELECT    *
       FROM    logs
-      WHERE    id > {} AND isdir = 0
+      WHERE    id > {} AND time > strftime('%s', 'now') - 5 * 60 AND isdir = 0
      ) B
      WHERE    A.filename = B.filename
      AND A.cmd = 'create' AND B.cmd = 'write'
@@ -41,67 +41,13 @@ fn fmt_qsuspiciouscwd(id: i32, period: i32) -> String {
       SELECT    *
       FROM    logs
       WHERE    isdir = 0 AND cmd = 'delete'
-                AND id > {} AND isdir = 0
+                AND id > {} AND time > strftime('%s', 'now') - 5 * 60 AND isdir = 0
      ) D
      WHERE    CWp.writetime <= D.time
      AND (D.time - CWp.writetime) <= {}
      AND D.filesize <= CWp.wrotefilesize
     ;",
         id, id, id, period
-    )
-}
-
-fn fmt_qsuspiciouscrwd(id: i32, period: i32) -> String {
-    format!(
-        "SELECT *
-     FROM
-     (
-      SELECT    A.ip, A.username, A.filename,
-      B.filesize AS wrotefilesize,
-      A.cmd, A.time, B.cmd,
-      B.time AS btime
-      FROM
-      (
-       SELECT    *
-       FROM    logs
-       WHERE    id > {} AND isdir = 0
-      ) A,
-      (
-       SELECT    *
-       FROM    logs
-       WHERE    id > {} AND isdir = 0
-      ) B
-      WHERE    A.isdir = 0 AND B.isdir = 0
-     AND A.filename = B.filename
-     AND A.cmd = 'create' AND B.cmd='write'
-     AND A.time <= B.time AND (B.time - A.time) <= 1
-     ) CWp, (
-         SELECT    C.filename,
-         D.filesize AS deletedfilesize,
-         C.cmd,
-         C.time AS ctime,
-         D.cmd,    D.time
-         FROM
-         (
-          SELECT    *
-          FROM    logs
-          WHERE    id > {} AND isdir = 0
-         ) C,
-         (
-          SELECT    *
-          FROM    logs
-          WHERE    id > {} AND isdir = 0
-         ) D
-         WHERE    C.isdir = 0 AND D.isdir = 0
-         AND C.filename = D.filename
-         AND C.cmd = 'read' AND D.cmd = 'delete'
-         AND C.time <= D.time AND (D.time - C.time) <= {}
-         ) RDp
-         WHERE    CWp.btime = RDp.ctime
-         AND RDp.deletedfilesize <= CWp.wrotefilesize
-         AND RDp.deletedfilesize > 0
-         ;",
-        id, id, id, id, period
     )
 }
 
@@ -150,7 +96,6 @@ pub fn updated_id(conn: &Connection) -> i32 {
 pub enum Type {
     Delete,
     SuspiciousCwd,
-    SuspiciousCrwd,
     Move,
 }
 
@@ -190,7 +135,6 @@ pub fn select(conn: &Connection, qtype: Type, id: &i32) -> Vec<Log> {
         match qtype {
             Type::Delete => conn.prepare(&fmt_qdelete(*id, 10)).unwrap(),
             Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(*id, 5)).unwrap(),
-            Type::SuspiciousCrwd => conn.prepare(&fmt_qsuspiciouscrwd(*id, 5)).unwrap(),
             Type::Move => conn.prepare(&fmt_qmove(*id)).unwrap(),
         }
     };

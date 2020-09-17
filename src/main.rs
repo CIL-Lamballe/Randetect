@@ -96,13 +96,14 @@ fn main() {
         Ok(conn) => conn,
     };
     let mut id = query::updated_id(&conn);
+    let mut idsup = id;
 
     loop {
         let mut list: HashMap<String, parse::UserInfo> = HashMap::new();
 
         let mut query = query::select(&conn, Type::Move, &id);
         query.extend(query::select(&conn, Type::Delete, &id));
-        query.extend(query::select(&conn, Type::SuspiciousCwd, &id));
+        query.extend(query::select(&conn, Type::SuspiciousCwd, &idsup));
 
         id = query::updated_id(&conn);
 
@@ -128,6 +129,7 @@ fn main() {
                         sms::send(&var, format!(
                                 "Alert NAS {} user: {} banned because of suspicious activity {} times from ip:{:?}"
                                 , sys_info::hostname().unwrap(), name, *c, info.get_ips()));
+                        idsup = query::updated_id(&conn);
                     }
                     Behavior::Move(_s) => {
                         email::send(&var, &name, info, "Move");
