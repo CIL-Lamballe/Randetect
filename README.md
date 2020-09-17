@@ -48,7 +48,6 @@
 
 
 
-<!-- ABOUT THE PROJECT -->
 ## About The Project
 
 There are plenty of users that sometimes does not manipulate files properly. They corrupt file system hierarchy which disrupts production.
@@ -189,12 +188,12 @@ Project Link: [https://github.com/CIL-Lamballe](https://github.com/CIL-Lamballe)
 
 
 
-[contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=flat-square
-[contributors-url]: https://github.com/othneildrew/Best-README-Template/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/othneildrew/Best-README-Template.svg?style=flat-square
-[forks-url]: https://github.com/othneildrew/Best-README-Template/network/members
+[contributors-shield]: https://img.shields.io/github/contributors/CIL-Lamballe/Randetect?style=flat-square
+[contributors-url]: https://github.com/CIL-Lamballe/Randetect/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/CIL-Lamballe/Randetect.svg?style=flat-square
+[forks-url]: https://github.com/CIL-Lamballe/Randetect/network/members
 [issues-shield]: https://img.shields.io/github/issues/CIL-Lamballe/Randetect
-[issues-url]: https://github.com/othneildrew/Best-README-Template/issues
+[issues-url]: https://github.com/CIL-Lamballe/Randetect/issues
 [license-shield]: https://img.shields.io/badge/license-GPL%20(%3E%3D%202)-blue
 [license-url]: https://github.com/CIL-Lamballe/Randetect/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat&logo=appveyor&logo=linkedin&colorB=555
