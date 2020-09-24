@@ -3,16 +3,20 @@ use serde_json::Value;
 use std::{process::Command, thread, time::Duration};
 
 pub fn cmd_exec(cmd: &str) -> (String, String, String) {
+    #[cfg(debug_assertions)]
     println!("{}", cmd);
+
     let output = Command::new("bash")
         .arg("-c")
         .arg(cmd)
         .output()
         .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
 
-    // Debug
+    #[cfg(debug_assertions)]
     println!("status: {}", output.status);
+    #[cfg(debug_assertions)]
     println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+    #[cfg(debug_assertions)]
     println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
 
     (
@@ -58,36 +62,36 @@ fn close_request() -> String {
         .to_string()
 }
 
+/// Quick Ban:
+/// - Format ban request,
+/// - Apply new profile and request `task_id`,
+/// - Update the profile using `task_id`,
+/// - Finalize the request,
+/// - Restart Samba to kick off user,
+/// then slow redo for webclient to capture it.
 pub fn ban(info: &UserInfo) {
     {
-        // Quick Ban
         for ip in info.get_ips().iter() {
-            // Format ban request
             let cmd = ban_profile(&ip);
             cmd_exec(&cmd);
 
-            // Apply new profile and request task_id
             let cmd = apply_profile();
             let (_status, stdout, _stderr) = cmd_exec(&cmd);
             let v: Value = serde_json::from_str(&stdout).unwrap();
             let v: Value = serde_json::from_str(&v["data"].to_string()).unwrap();
             let v = v["task_id"].to_string();
 
-            // Update the profile using task_id
             let cmd = update_profile(&v);
             cmd_exec(&cmd);
 
-            // Finalize the request
             let cmd = close_request();
             cmd_exec(&cmd);
 
-            // Restart Samba to kick off user
             cmd_exec("/sbin/restart smbd");
         }
     }
 
     {
-        // Slow redo for webclient to capture it
         for ip in info.get_ips().iter() {
             let cmd = ban_profile(&ip);
             cmd_exec(&cmd);

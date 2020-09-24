@@ -12,32 +12,42 @@ pub mod sms {
         digits
     }
 
-    fn file(text: String) -> String {
+    fn file(text: &str) -> String {
         let now = format!("{:?}", SystemTime::now());
-        //        println!("{:?}", now);
+
+        #[cfg(debug_assertions)]
+        println!("{:?}", now);
+
         let now = digits(&now);
-        //        println!("{:?}", now);
+
+        #[cfg(debug_assertions)]
+        println!("{:?}", now);
 
         let fname = format!("{}_sms.txt", now);
-        //        println!("{:?}", fname);
+
+        #[cfg(debug_assertions)]
+        println!("{:?}", fname);
 
         let mut file = File::create(&fname).unwrap();
-        file.write(text.as_bytes()).unwrap();
+        file.write_all(text.as_bytes()).unwrap();
         fname
     }
 
-    pub fn send(cdtl: &Cdtl, text: String) {
-        // write down text in a file which is the sms to be sent
-        //      println!("{}", text);
+    pub fn send(cdtl: &Cdtl, text: &str) {
+        #[cfg(debug_assertions)]
+        println!("{}", text);
+
         let fname = file(text);
 
-        // Format the command to send sms
         let arg = format!(
             "open -u {},{} {}; put -O {} {}",
             cdtl.user, cdtl.pwd, cdtl.sys, cdtl.folder, fname
         );
         let arg = format!("lftp -c \"{}\"", arg);
-        //        println!("\n{:?}\n", arg);
+
+        #[cfg(debug_assertions)]
+        println!("\n{:?}\n", arg);
+
         nas::cmd_exec(&arg);
         fs::remove_file(fname).unwrap();
     }
@@ -57,7 +67,10 @@ pub mod email {
                     format!("{} performed {}\nDetail:\n{:?}", user, act, info)
                 )
             );
-        // println!("{}", ssmtp);
+
+        #[cfg(debug_assertions)]
+        println!("{}", ssmtp);
+
         nas::cmd_exec(&ssmtp);
     }
 }

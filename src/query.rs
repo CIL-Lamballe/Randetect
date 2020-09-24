@@ -128,18 +128,18 @@ impl Log {
     }
 }
 
-/// Retrieve SQL relations corresponding to given user action(qtype: Move | Delete | SuspiciousCwd
-/// | SuspiciousCrwd)
-pub fn select(conn: &Connection, qtype: Type, id: &i32) -> Vec<Log> {
+/// Retrieve SQL relations corresponding to given user `action(qtype: Move | Delete | SuspiciousCwd)`
+pub fn select(conn: &Connection, qtype: Type, id: i32) -> Vec<Log> {
     let mut stmt = {
         match qtype {
-            Type::Delete => conn.prepare(&fmt_qdelete(*id, 10)).unwrap(),
-            Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(*id, 5)).unwrap(),
-            Type::Move => conn.prepare(&fmt_qmove(*id)).unwrap(),
+            Type::Delete => conn.prepare(&fmt_qdelete(id, 10)).unwrap(),
+            Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(id, 5)).unwrap(),
+            Type::Move => conn.prepare(&fmt_qmove(id)).unwrap(),
         }
     };
 
-    //  println!("query:{:?}", stmt);
+    #[cfg(debug_assertions)]
+    println!("query stmt:{:?}", stmt);
 
     let logs = stmt
         .query_map(params![], |row| {
@@ -154,7 +154,9 @@ pub fn select(conn: &Connection, qtype: Type, id: &i32) -> Vec<Log> {
 
     let mut relation: Vec<Log> = Vec::new();
     for each in logs {
-        //      println!("here: {:?}", each);
+        #[cfg(debug_assertions)]
+        println!("each in logs: {:?}", each);
+
         match each {
             Ok(t) => relation.push(t),
             Err(_e) => (),
