@@ -101,9 +101,9 @@ fn main() {
     loop {
         let mut list: HashMap<String, parse::UserInfo> = HashMap::new();
 
-        let mut query = query::select(&conn, Type::Move, &id);
-        query.extend(query::select(&conn, Type::Delete, &id));
-        query.extend(query::select(&conn, Type::SuspiciousCwd, &idsup));
+        let mut query = query::select(&conn, Type::Move, id);
+        query.extend(query::select(&conn, Type::Delete, id));
+        query.extend(query::select(&conn, Type::SuspiciousCwd, idsup));
 
         id = query::updated_id(&conn);
 
@@ -111,7 +111,7 @@ fn main() {
 
         let mut shutdown = 0;
 
-        for user in list.iter() {
+        for user in &list {
             let (name, info) = user;
             for beh in info.get_behaviors() {
                 match beh {
@@ -120,7 +120,7 @@ fn main() {
                         email::send(&var, &name, info, "delete");
                         sms::send(&var, &format!(
                                 "Alert NAS {} user: {} banned because of deleting {} files from ip:{:?}"
-                                , sys_info::hostname().unwrap(), name, *c, info.get_ips()));
+                                , sys_info::hostname().unwrap(), name, c, info.get_ips()));
                     }
                     Behavior::Suspicious(c) if *c >= BAN_LIMIT => {
                         nas::ban(info);
@@ -128,7 +128,7 @@ fn main() {
                         email::send(&var, &name, info, "Suspicious");
                         sms::send(&var, &format!(
                                 "Alert NAS {} user: {} banned because of suspicious activity {} times from ip:{:?}"
-                                , sys_info::hostname().unwrap(), name, *c, info.get_ips()));
+                                , sys_info::hostname().unwrap(), name, c, info.get_ips()));
                         idsup = query::updated_id(&conn);
                     }
                     Behavior::Move(_s) => {

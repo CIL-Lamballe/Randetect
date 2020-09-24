@@ -29,18 +29,16 @@ pub mod sms {
         println!("{:?}", fname);
 
         let mut file = File::create(&fname).unwrap();
-        file.write(text.as_bytes()).unwrap();
+        file.write_all(text.as_bytes()).unwrap();
         fname
     }
 
     pub fn send(cdtl: &Cdtl, text: &str) {
-        /// write down text in a file which is the sms to be sent
         #[cfg(debug_assertions)]
         println!("{}", text);
 
         let fname = file(text);
 
-        /// Format the command to send sms
         let arg = format!(
             "open -u {},{} {}; put -O {} {}",
             cdtl.user, cdtl.pwd, cdtl.sys, cdtl.folder, fname

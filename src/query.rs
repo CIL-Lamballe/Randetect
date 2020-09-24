@@ -128,14 +128,13 @@ impl Log {
     }
 }
 
-/// Retrieve SQL relations corresponding to given user action(qtype: Move | Delete | SuspiciousCwd
-/// | SuspiciousCrwd)
-pub fn select(conn: &Connection, qtype: Type, id: &i32) -> Vec<Log> {
+/// Retrieve SQL relations corresponding to given user `action(qtype: Move | Delete | SuspiciousCwd)`
+pub fn select(conn: &Connection, qtype: Type, id: i32) -> Vec<Log> {
     let mut stmt = {
         match qtype {
-            Type::Delete => conn.prepare(&fmt_qdelete(*id, 10)).unwrap(),
-            Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(*id, 5)).unwrap(),
-            Type::Move => conn.prepare(&fmt_qmove(*id)).unwrap(),
+            Type::Delete => conn.prepare(&fmt_qdelete(id, 10)).unwrap(),
+            Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(id, 5)).unwrap(),
+            Type::Move => conn.prepare(&fmt_qmove(id)).unwrap(),
         }
     };
 

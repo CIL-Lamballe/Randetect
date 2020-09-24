@@ -62,36 +62,36 @@ fn close_request() -> String {
         .to_string()
 }
 
+/// Quick Ban:
+/// - Format ban request,
+/// - Apply new profile and request `task_id`,
+/// - Update the profile using `task_id`,
+/// - Finalize the request,
+/// - Restart Samba to kick off user,
+/// then slow redo for webclient to capture it.
 pub fn ban(info: &UserInfo) {
     {
-        /// Quick Ban
         for ip in info.get_ips().iter() {
-            /// Format ban request
             let cmd = ban_profile(&ip);
             cmd_exec(&cmd);
 
-            /// Apply new profile and request task_id
             let cmd = apply_profile();
             let (_status, stdout, _stderr) = cmd_exec(&cmd);
             let v: Value = serde_json::from_str(&stdout).unwrap();
             let v: Value = serde_json::from_str(&v["data"].to_string()).unwrap();
             let v = v["task_id"].to_string();
 
-            /// Update the profile using task_id
             let cmd = update_profile(&v);
             cmd_exec(&cmd);
 
-            /// Finalize the request
             let cmd = close_request();
             cmd_exec(&cmd);
 
-            /// Restart Samba to kick off user
             cmd_exec("/sbin/restart smbd");
         }
     }
 
     {
-        /// Slow redo for webclient to capture it
         for ip in info.get_ips().iter() {
             let cmd = ban_profile(&ip);
             cmd_exec(&cmd);
