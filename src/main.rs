@@ -15,10 +15,10 @@ use std::{collections::HashMap, env, fs::File, process, thread, time::Duration};
 
 macro_rules! nas_shutdown {
     () => {
-        String::from(format!(
+        &format!(
             "Alert NAS {} shutdown ! Because of too many suspicious activities !",
             sys_info::hostname().unwrap()
-        ))
+        )
     };
 }
 
@@ -41,7 +41,7 @@ const TIME: u64 = 800;
 /// Get environment variable for lftp use
 fn getenv(var: &str) -> String {
     match env::var(var) {
-        Ok(val) => val,
+        Ok(v) => v,
         Err(e) => panic!("{} : {}", var, e),
     }
 }
@@ -118,7 +118,7 @@ fn main() {
                     Behavior::Delete(c) if *c >= BAN_LIMIT => {
                         nas::ban(info);
                         email::send(&var, &name, info, "delete");
-                        sms::send(&var, format!(
+                        sms::send(&var, &format!(
                                 "Alert NAS {} user: {} banned because of deleting {} files from ip:{:?}"
                                 , sys_info::hostname().unwrap(), name, *c, info.get_ips()));
                     }
@@ -126,7 +126,7 @@ fn main() {
                         nas::ban(info);
                         shutdown += 1;
                         email::send(&var, &name, info, "Suspicious");
-                        sms::send(&var, format!(
+                        sms::send(&var, &format!(
                                 "Alert NAS {} user: {} banned because of suspicious activity {} times from ip:{:?}"
                                 , sys_info::hostname().unwrap(), name, *c, info.get_ips()));
                         idsup = query::updated_id(&conn);

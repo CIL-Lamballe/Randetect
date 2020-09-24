@@ -139,7 +139,8 @@ pub fn select(conn: &Connection, qtype: Type, id: &i32) -> Vec<Log> {
         }
     };
 
-    //  println!("query:{:?}", stmt);
+    #[cfg(debug_assertions)]
+    println!("query stmt:{:?}", stmt);
 
     let logs = stmt
         .query_map(params![], |row| {
@@ -154,7 +155,9 @@ pub fn select(conn: &Connection, qtype: Type, id: &i32) -> Vec<Log> {
 
     let mut relation: Vec<Log> = Vec::new();
     for each in logs {
-        //      println!("here: {:?}", each);
+        #[cfg(debug_assertions)]
+        println!("each in logs: {:?}", each);
+
         match each {
             Ok(t) => relation.push(t),
             Err(_e) => (),

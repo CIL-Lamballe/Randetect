@@ -74,16 +74,16 @@ impl UserInfo {
 pub fn log(entry: Vec<Log>, users: &mut HashMap<String, UserInfo>) {
     for el in entry {
         let uname = el.get_username();
-        if !users.contains_key(&uname) {
-            users.insert(
-                uname,
-                UserInfo::new(el.get_ip(), el.get_kind(), el.get_dir()),
-            );
-        } else {
+        if users.contains_key(&uname) {
             users
                 .get_mut(&uname)
                 .unwrap()
                 .update(el.get_ip(), el.get_kind(), el.get_dir());
+        } else {
+            users.insert(
+                uname,
+                UserInfo::new(el.get_ip(), el.get_kind(), el.get_dir()),
+            );
         }
     }
 }
