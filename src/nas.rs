@@ -70,6 +70,9 @@ fn close_request() -> String {
 /// - Restart Samba to kick off user,
 /// then slow redo for webclient to capture it.
 pub fn ban(info: &UserInfo) {
+    #[cfg(debug_assertions)]
+    println!("BAN: {:?}", info);
+
     {
         for ip in info.get_ips().iter() {
             let cmd = ban_profile(&ip);

@@ -36,6 +36,28 @@ impl UserInfo {
         }
     }
 
+    fn update(&mut self, newip: String, t: Type, dir: String) {
+        match t {
+            Type::Delete => {
+                for each in &mut self.kind {
+                    match each {
+                        Behavior::Delete(c) => *c = *c + 1,
+                        _ => (),
+                    };
+                }
+            }
+            Type::SuspiciousCwd => {
+                for each in &mut self.kind {
+                    if let Behavior::Suspicious(c) = each { *c = *c + 1; println!("count: {}", *c) };
+                }
+            }
+            Type::Move => self.kind.push(Behavior::Move(dir)),
+        }
+        if !self.ip.contains(&newip) {
+            self.ip.push(newip);
+        }
+    }
+
     pub fn get_behaviors(&self) -> &Vec<Behavior> {
         &self.kind
     }
@@ -49,10 +71,22 @@ impl UserInfo {
 /// Accounting of action in order to determine user behavior(Normal, Suspicious, Misbehaving)
 pub fn log(entry: Vec<Log>, users: &mut HashMap<String, UserInfo>) {
     for el in entry {
+
+        {
+            println!("kind: {:?}", el.get_kind());
+        }
+
         let uname = el.get_username();
-        let update = users
-            .entry(uname)
-            .or_insert_with(|| UserInfo::new(el.get_ip(), el.get_kind(), el.get_dir()));
-        *update = UserInfo::new(el.get_ip(), el.get_kind(), el.get_dir());
+        if users.contains_key(&uname) {
+            users
+                .get_mut(&uname)
+                .unwrap()
+                .update(el.get_ip(), el.get_kind(), el.get_dir());
+        } else {
+            users.insert(
+                uname,
+                UserInfo::new(el.get_ip(), el.get_kind(), el.get_dir()),
+            );
+        }
     }
 }
