@@ -23,11 +23,11 @@ do
 	printf "$a\n"
 	tput init
 	#RELEASE
-	#if (cross build --target=${a}-unknown-linux-musl --release &&
-	#	cp target/${a}-unknown-linux-musl/release/randetect randetect_${a}-musl)
+	if (cross build --target=${a}-unknown-linux-musl --release &&
+		cp target/${a}-unknown-linux-musl/release/randetect randetect_${a}-musl)
 	# DEBUG
-	if (cross build --target=${a}-unknown-linux-musl &&
-		cp target/${a}-unknown-linux-musl/debug/randetect randetect_${a}-musl)
+	#if (cross build --target=${a}-unknown-linux-musl &&
+	#	cp target/${a}-unknown-linux-musl/debug/randetect randetect_${a}-musl)
 	then
 		tput bold
 		tput setaf 46
