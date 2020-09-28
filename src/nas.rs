@@ -73,6 +73,7 @@ pub fn ban(info: &UserInfo) {
     #[cfg(debug_assertions)]
     println!("BAN: {:?}", info);
 
+    #[cfg(not(debug_assertions))]
     {
         for ip in info.get_ips().iter() {
             let cmd = ban_profile(&ip);
@@ -91,9 +92,10 @@ pub fn ban(info: &UserInfo) {
             cmd_exec(&cmd);
 
             cmd_exec("/sbin/restart smbd");
+            cmd_exec("/sbin/restart sshd");
         }
     }
-
+    #[cfg(not(debug_assertions))]
     {
         for ip in info.get_ips().iter() {
             let cmd = ban_profile(&ip);
@@ -117,5 +119,6 @@ pub fn ban(info: &UserInfo) {
 }
 
 pub fn poweroff() {
+    #[cfg(not(debug_assertions))]
     cmd_exec("shutdown -h now");
 }

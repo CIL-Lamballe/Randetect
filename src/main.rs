@@ -84,7 +84,7 @@ fn daemonize() {
 }
 
 fn main() {
-    #[cfg(debug_assertions)]
+    #[cfg(not(debug_assertions))]
     daemonize();
 
     let var: Cdtl = env_variables();
