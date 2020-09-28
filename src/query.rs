@@ -1,7 +1,7 @@
 use rusqlite::{params, Connection, Result};
 
 #[cfg(debug_assertions)]
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 /// Query performed to Samba Log Database
 ///  - `id` is the last log number from which scan is performed, id is updated after a banned to
