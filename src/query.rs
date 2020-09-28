@@ -4,10 +4,7 @@ fn fmt_qdelete(id: i32, period: i32) -> String {
     format!(
         "SELECT username, ip
              FROM   logs
-             WHERE  id > {} AND isdir = 0
-             AND cmd = 'delete'
-           AND time > ( SELECT MAX(time)
-            FROM logs ) - {}
+             WHERE  id > {} AND time > strftime('%s', 'now') - 1 * 60 AND isdir = 0 AND cmd = 'delete' AND time > ( SELECT MAX(time) FROM logs ) - {}
         ;",
         id, period
     )
@@ -133,7 +130,7 @@ pub fn select(conn: &Connection, qtype: Type, id: i32) -> Vec<Log> {
     let mut stmt = {
         match qtype {
             Type::Delete => conn.prepare(&fmt_qdelete(id, 3)).unwrap(),
-            Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(id, 5)).unwrap(),
+            Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(id, 3)).unwrap(),
             Type::Move => conn.prepare(&fmt_qmove(id)).unwrap(),
         }
     };
