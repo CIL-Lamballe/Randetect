@@ -72,7 +72,7 @@ fn close_request() -> String {
 pub fn ban(info: &UserInfo) {
     #[cfg(debug_assertions)]
     println!("BAN: {:?}", info);
-
+    return;
     {
         for ip in info.get_ips().iter() {
             let cmd = ban_profile(&ip);

@@ -22,6 +22,7 @@ macro_rules! nas_shutdown {
     };
 }
 
+/// Samaba Log Database
 const DB: &str = "/var/log/synolog/.SMBXFERDB";
 
 /// Maximum of suspicious actions
@@ -118,6 +119,9 @@ fn main() {
 
         let mut shutdown = 0;
 
+        #[cfg(debug_assertions)]
+        println!("list {:?}\n-------", list);
+
         for user in &list {
             let (name, info) = user;
             for beh in info.get_behaviors() {
@@ -128,7 +132,7 @@ fn main() {
                        //    println!("Alert NAS {} user: {} banned because of deleting {} files from ip:{:?}"
                        //    , sys_info::hostname().unwrap(), name, c, info.get_ips());
                        // }
-                        //nas::ban(info);
+                        nas::ban(info);
                         //email::send(&var, &name, info, "delete");
                         //sms::send(&var, &format!(
                         //        "Alert NAS {} user: {} banned because of deleting {} files from ip:{:?}"
@@ -142,7 +146,7 @@ fn main() {
                             , sys_info::hostname().unwrap(), name, c, info.get_ips());
                             println!("idsup: {:?}", idsup);
                         }
-                        //nas::ban(info);
+                        nas::ban(info);
                         //shutdown += 1;
                         //email::send(&var, &name, info, "Suspicious");
                         //sms::send(&var, &format!(

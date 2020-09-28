@@ -1,12 +1,16 @@
 use rusqlite::{params, Connection, Result};
 
+/// Query performed to Samba Log Database
+///  - `id` is the last log number from which scan is performed, id is updated after a banned to
+///  the newest id number.
+///  - `period` is the period scanned
 fn fmt_qdelete(id: i32, period: i32) -> String {
     format!(
         "SELECT username, ip
              FROM   logs
-             WHERE  id > {} AND time > strftime('%s', 'now') - 1 * 60 AND isdir = 0 AND cmd = 'delete' AND time > ( SELECT MAX(time) FROM logs ) - {}
+             WHERE  id > {} AND isdir = 0 AND cmd = 'delete' AND time > ( SELECT MAX(time) FROM logs WHERE id > {} ) - {}
         ;",
-        id, period
+        id, id, period
     )
 }
 
@@ -129,7 +133,9 @@ impl Log {
 pub fn select(conn: &Connection, qtype: Type, id: i32) -> Vec<Log> {
     let mut stmt = {
         match qtype {
-            Type::Delete => conn.prepare(&fmt_qdelete(id, 3)).unwrap(),
+            // Check maximum delete number within interval of 5seconds from last id (last ban or
+            // start id)
+            Type::Delete => conn.prepare(&fmt_qdelete(id, 5)).unwrap(),
             Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(id, 3)).unwrap(),
             Type::Move => conn.prepare(&fmt_qmove(id)).unwrap(),
         }
@@ -159,5 +165,8 @@ pub fn select(conn: &Connection, qtype: Type, id: i32) -> Vec<Log> {
             Err(_e) => (),
         }
     }
+     #[cfg(debug_assertions)]
+     println!("relation: {:?}", relation);
+
     relation
 }
