@@ -69,9 +69,9 @@ impl UserInfo {
 pub fn log(entry: Vec<Log>, users: &mut HashMap<String, UserInfo>) {
     for el in entry {
 
-        {
-            println!("kind: {:?}", el.get_kind());
-        }
+      //  {
+     //       println!("kind: {:?}", el.get_kind());
+      //  }
 
         let uname = el.get_username();
         if users.contains_key(&uname) {
