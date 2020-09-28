@@ -40,15 +40,12 @@ impl UserInfo {
         match t {
             Type::Delete => {
                 for each in &mut self.kind {
-                    match each {
-                        Behavior::Delete(c) => *c = *c + 1,
-                        _ => (),
-                    };
+                    if let Behavior::Delete(c) = each { *c += 1 };
                 }
             }
             Type::SuspiciousCwd => {
                 for each in &mut self.kind {
-                    if let Behavior::Suspicious(c) = each { *c = *c + 1; println!("count: {}", *c) };
+                    if let Behavior::Suspicious(c) = each { *c += 1 };
                 }
             }
             Type::Move => self.kind.push(Behavior::Move(dir)),

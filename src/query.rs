@@ -135,7 +135,8 @@ pub fn select(conn: &Connection, qtype: Type, id: i32) -> Vec<Log> {
         match qtype {
             // Check maximum delete number within interval of 5seconds from last id (last ban or
             // start id)
-            Type::Delete => conn.prepare(&fmt_qdelete(id, 5)).unwrap(),
+            // Recommanded interval value: 3
+            Type::Delete => conn.prepare(&fmt_qdelete(id, 3)).unwrap(),
             Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(id, 3)).unwrap(),
             Type::Move => conn.prepare(&fmt_qmove(id)).unwrap(),
         }
