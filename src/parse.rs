@@ -40,12 +40,16 @@ impl UserInfo {
         match t {
             Type::Delete => {
                 for each in &mut self.kind {
-                    if let Behavior::Delete(c) = each { *c += 1 };
+                    if let Behavior::Delete(c) = each {
+                        *c += 1
+                    };
                 }
             }
             Type::SuspiciousCwd => {
                 for each in &mut self.kind {
-                    if let Behavior::Suspicious(c) = each { *c += 1 };
+                    if let Behavior::Suspicious(c) = each {
+                        *c += 1
+                    };
                 }
             }
             Type::Move => self.kind.push(Behavior::Move(dir)),
@@ -68,11 +72,6 @@ impl UserInfo {
 /// Accounting of action in order to determine user behavior(Normal, Suspicious, Misbehaving)
 pub fn log(entry: Vec<Log>, users: &mut HashMap<String, UserInfo>) {
     for el in entry {
-
-      //  {
-     //       println!("kind: {:?}", el.get_kind());
-      //  }
-
         let uname = el.get_username();
         if users.contains_key(&uname) {
             users

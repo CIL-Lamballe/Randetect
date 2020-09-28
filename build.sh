@@ -1,6 +1,6 @@
 #!/bin/bash
-#arch=('aarch64' 'x86_64')
-arch=('x86_64')
+arch=('aarch64' 'x86_64')
+#arch=('x86_64')
 #printf "Check code base:\n"
 #if (cargo fmt && cargo clippy --all-targets --all-features -- -D clippy::pedantic)
 #then

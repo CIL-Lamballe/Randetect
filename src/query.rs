@@ -144,19 +144,18 @@ pub fn select(conn: &Connection, qtype: Type, id: i32) -> Vec<Log> {
             // Check maximum delete number within interval of 5seconds from last id (last ban or
             // start id)
             // Recommanded interval value: 3
-     //       Type::Delete => conn.prepare(&fmt_qdelete(id, 3)).unwrap(),
-            Type::Delete => conn.prepare(&fmt_qmove(id)).unwrap(),
+            Type::Delete => conn.prepare(&fmt_qdelete(id, 3)).unwrap(),
+
             // Check maximum possible encryption schemes which encryption took 20seconds.
             // Recommanded interval value: 5sec
             // Increase this number will capture large files, but increase query time.
             // Overall period scanned in Database 2 * 60 seconds.
             Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(id, 5, 2 * 60)).unwrap(),
+
             Type::Move => conn.prepare(&fmt_qmove(id)).unwrap(),
         }
     };
 
-    //    #[cfg(debug_assertions)]
-    //    println!("query stmt:{:?}", stmt);
     #[cfg(debug_assertions)]
     let now = Instant::now();
 
@@ -180,12 +179,9 @@ pub fn select(conn: &Connection, qtype: Type, id: i32) -> Vec<Log> {
         #[cfg(debug_assertions)]
         println!("eachlog: {:?}", each);
 
-        if iter >= super::BAN_LIMIT{
-      //  #[cfg(debug_assertions)]
-      //  println!("nb log reached: {}", iter);
+        if iter >= super::BAN_LIMIT {
             break;
         }
-
         match each {
             Ok(t) => relation.push(t),
             Err(_e) => (),
@@ -194,10 +190,10 @@ pub fn select(conn: &Connection, qtype: Type, id: i32) -> Vec<Log> {
     }
 
     #[cfg(debug_assertions)]
-    println!("relation push time {}", now.elapsed().as_millis());
-
-    //  #[cfg(debug_assertions)]
-   //  println!("relation: {:?}", relation);
+    {
+        println!("relation push time {}", now.elapsed().as_millis());
+        println!("relation: {:?}", relation);
+    }
 
     relation
 }

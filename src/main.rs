@@ -84,7 +84,8 @@ fn daemonize() {
 }
 
 fn main() {
-    //    daemonize();
+    #[cfg(debug_assertions)]
+    daemonize();
 
     let var: Cdtl = env_variables();
 
@@ -105,20 +106,16 @@ fn main() {
     loop {
         #[cfg(debug_assertions)]
         {
-         println!("id: {:?}", id);
-         println!("idsup: {:?}\n", idsup);
+            println!("id: {:?}", id);
+            println!("idsup: {:?}\n", idsup);
         }
 
         let mut list: HashMap<String, parse::UserInfo> = HashMap::new();
-
         let mut query = query::select(&conn, Type::Move, id);
         query.extend(query::select(&conn, Type::Delete, id));
         query.extend(query::select(&conn, Type::SuspiciousCwd, idsup));
-
         parse::log(query, &mut list);
-
-       // let mut shutdown = 0;
-        let shutdown = 0;
+        let mut shutdown = 0;
 
         #[cfg(debug_assertions)]
         println!("list {:?}\n-------", list);
@@ -128,17 +125,18 @@ fn main() {
             for beh in info.get_behaviors() {
                 match beh {
                     Behavior::Delete(c) if *c >= BAN_LIMIT => {
-                       // #[cfg(debug_assertions)]
-                       // {
-                       //    println!("Alert NAS {} user: {} banned because of deleting +{} files from ip:{:?}"
-                       //    , sys_info::hostname().unwrap(), name, c, info.get_ips());
-                       // }
-                //        nas::ban(info);
-                        //email::send(&var, &name, info, "delete");
-                        //sms::send(&var, &format!(
-                        //        "Alert NAS {} user: {} banned because of deleting +{} files from ip:{:?}"
-                        //        , sys_info::hostname().unwrap(), name, c, info.get_ips()));
-               //         id = query::updated_id(&conn);
+                        #[cfg(debug_assertions)]
+                        {
+                            println!("Alert NAS {} user: {} banned because of deleting +{} files from ip:{:?}"
+                            , sys_info::hostname().unwrap(), name, c, info.get_ips());
+                        }
+
+                        nas::ban(info);
+                        email::send(&var, &name, info, "delete");
+                        sms::send(&var, &format!(
+                                "Alert NAS {} user: {} banned because of deleting +{} files from ip:{:?}"
+                                , sys_info::hostname().unwrap(), name, c, info.get_ips()));
+                        id = query::updated_id(&conn);
                     }
                     Behavior::Suspicious(c) if *c >= BAN_LIMIT => {
                         #[cfg(debug_assertions)]
@@ -147,12 +145,13 @@ fn main() {
                             , sys_info::hostname().unwrap(), name, c, info.get_ips());
                             println!("idsup: {:?}", idsup);
                         }
+
                         nas::ban(info);
-                        //shutdown += 1;
-                        //email::send(&var, &name, info, "Suspicious");
-                        //sms::send(&var, &format!(
-                        //        "Alert NAS {} user: {} banned because of suspicious activity +{} times from ip:{:?}"
-                        //        , sys_info::hostname().unwrap(), name, c, info.get_ips()));
+                        shutdown += 1;
+                        email::send(&var, &name, info, "Suspicious");
+                        sms::send(&var, &format!(
+                                "Alert NAS {} user: {} banned because of suspicious activity +{} times from ip:{:?}"
+                                , sys_info::hostname().unwrap(), name, c, info.get_ips()));
                         idsup = query::updated_id(&conn);
                         id = query::updated_id(&conn);
                     }
