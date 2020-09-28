@@ -12,11 +12,8 @@ pub fn cmd_exec(cmd: &str) -> (String, String, String) {
         .output()
         .unwrap_or_else(|e| panic!("failed to execute process: {}", e));
 
-    #[cfg(debug_assertions)]
     println!("status: {}", output.status);
-    #[cfg(debug_assertions)]
     println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-    #[cfg(debug_assertions)]
     println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
 
     (
@@ -70,7 +67,6 @@ fn close_request() -> String {
 /// - Restart Samba to kick off user,
 /// then slow redo for webclient to capture it.
 pub fn ban(info: &UserInfo) {
-    #[cfg(debug_assertions)]
     println!("BAN: {:?}", info);
 
     #[cfg(not(debug_assertions))]
@@ -91,8 +87,10 @@ pub fn ban(info: &UserInfo) {
             let cmd = close_request();
             cmd_exec(&cmd);
 
-            cmd_exec("/sbin/restart smbd");
-            cmd_exec("/sbin/restart sshd");
+            //cmd_exec("/sbin/restart smbd");
+            //cmd_exec("/sbin/restart sshd");
+            cmd_exec("synoservicectl --restart sshd");
+            cmd_exec("synoservicectl --restart smbd");
         }
     }
     #[cfg(not(debug_assertions))]
@@ -113,7 +111,8 @@ pub fn ban(info: &UserInfo) {
             let cmd = close_request();
             cmd_exec(&cmd);
             thread::sleep(Duration::from_millis(1_000));
-            cmd_exec("/sbin/restart smbd");
+            cmd_exec("synoservicectl --restart smbd");
+            //cmd_exec("/sbin/restart smbd");
         }
     }
 }
