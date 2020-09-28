@@ -147,10 +147,10 @@ pub fn select(conn: &Connection, qtype: Type, id: i32) -> Vec<Log> {
      //       Type::Delete => conn.prepare(&fmt_qdelete(id, 3)).unwrap(),
             Type::Delete => conn.prepare(&fmt_qmove(id)).unwrap(),
             // Check maximum possible encryption schemes which encryption took 20seconds.
-            // Recommanded interval value: 20sec
+            // Recommanded interval value: 5sec
             // Increase this number will capture large files, but increase query time.
-            // Overall period scanned in Database 3 * 60 seconds.
-            Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(id, 45, 20 * 60)).unwrap(),
+            // Overall period scanned in Database 2 * 60 seconds.
+            Type::SuspiciousCwd => conn.prepare(&fmt_qsuspiciouscwd(id, 5, 2 * 60)).unwrap(),
             Type::Move => conn.prepare(&fmt_qmove(id)).unwrap(),
         }
     };
@@ -177,8 +177,8 @@ pub fn select(conn: &Connection, qtype: Type, id: i32) -> Vec<Log> {
     let mut iter: i32 = 0; // To be compared with BAN_LIMIT, no need to allocate more memory than the limit itself.
     let mut relation: Vec<Log> = Vec::new();
     for each in logs {
-     //   #[cfg(debug_assertions)]
-     //   println!("eachlog: {:?}", each);
+        #[cfg(debug_assertions)]
+        println!("eachlog: {:?}", each);
 
         if iter >= super::BAN_LIMIT{
       //  #[cfg(debug_assertions)]
