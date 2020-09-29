@@ -1,7 +1,7 @@
 #!/bin/bash
 arch=('aarch64' 'x86_64')
 printf "Check code base:\n"
-if (cargo fmt && cargo clippy --all-targets --all-features -- -D clippy::pedantic)
+if (cargo fmt && cargo clippy --release --all-targets --all-features -- -D clippy::pedantic)
 then
 	tput bold
 	tput setaf 46
