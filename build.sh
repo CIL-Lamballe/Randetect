@@ -1,7 +1,7 @@
 #!/bin/bash
 arch=('aarch64' 'x86_64')
 printf "Check code base:\n"
-if (cargo fmt && cargo clippy --all-targets --all-features -- -D clippy::pedantic)
+if (cargo fmt && cargo clippy --release --all-targets --all-features -- -D clippy::pedantic)
 then
 	tput bold
 	tput setaf 46
@@ -22,8 +22,12 @@ do
 	tput setaf 93
 	printf "$a\n"
 	tput init
+	#RELEASE
 	if (cross build --target=${a}-unknown-linux-musl --release &&
 		cp target/${a}-unknown-linux-musl/release/randetect randetect_${a}-musl)
+	# DEBUG
+	#if (cross build --target=${a}-unknown-linux-musl &&
+	#	cp target/${a}-unknown-linux-musl/debug/randetect randetect_${a}-musl)
 	then
 		tput bold
 		tput setaf 46

@@ -36,6 +36,29 @@ impl UserInfo {
         }
     }
 
+    fn update(&mut self, newip: String, t: Type, dir: String) {
+        match t {
+            Type::Delete => {
+                for each in &mut self.kind {
+                    if let Behavior::Delete(c) = each {
+                        *c += 1
+                    };
+                }
+            }
+            Type::SuspiciousCwd => {
+                for each in &mut self.kind {
+                    if let Behavior::Suspicious(c) = each {
+                        *c += 1
+                    };
+                }
+            }
+            Type::Move => self.kind.push(Behavior::Move(dir)),
+        }
+        if !self.ip.contains(&newip) {
+            self.ip.push(newip);
+        }
+    }
+
     pub fn get_behaviors(&self) -> &Vec<Behavior> {
         &self.kind
     }
@@ -50,9 +73,16 @@ impl UserInfo {
 pub fn log(entry: Vec<Log>, users: &mut HashMap<String, UserInfo>) {
     for el in entry {
         let uname = el.get_username();
-        let update = users
-            .entry(uname)
-            .or_insert_with(|| UserInfo::new(el.get_ip(), el.get_kind(), el.get_dir()));
-        *update = UserInfo::new(el.get_ip(), el.get_kind(), el.get_dir());
+        if users.contains_key(&uname) {
+            users
+                .get_mut(&uname)
+                .unwrap()
+                .update(el.get_ip(), el.get_kind(), el.get_dir());
+        } else {
+            users.insert(
+                uname,
+                UserInfo::new(el.get_ip(), el.get_kind(), el.get_dir()),
+            );
+        }
     }
 }
